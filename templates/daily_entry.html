@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Entry</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: url(/static/images/img.jpg) no-repeat center center/cover;
+            min-height: 100vh;
+            padding: 20px 0;
+            position: relative;
+        }
+        
+        /* Optional: Add overlay for better text readability */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.1);
+            z-index: -1;
+        }
+        .entry-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .section-header {
+            border-bottom: 2px solid #e9ecef;
+            margin: 25px 0 15px 0;
+            padding-bottom: 8px;
+        }
+        .home-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .form-control:invalid {
+            border-color: #dc3545;
+        }
+        .form-control:valid {
+            border-color: #198754;
+        }
+        
+        /* Custom section header colors */
+        .transport-header { color: #f0d806 !important; }      /* Red */
+        .diet-header { color: #5bdc06 !important; }           /* Teal */
+        .utility-header { color: #44dfeb !important; }        /* Yellow */
+        .lifestyle-header { color: #d95fdd !important; }      /* Light Green */
+        
+        /* Custom label colors */
+        .form-label {
+            color: #edf434 !important;        /* Default dark blue-gray */
+            font-weight: 800;                  /* Make labels bold */
+        }
+        
+        /* Section-specific label colors */
+        /* .transport-section .form-label { color: #e74c3c !important; }    /* Red labels for transport */
+        /* .diet-section .form-label { color: #27ae60 !important; }         Green labels for diet */
+        /* .utility-section .form-label { color: #f39c12 !important; }      Orange labels for utilities */
+        /* .lifestyle-section .form-label { color: #8e44ad !important; }    Purple labels for lifestyle */
+    </style>
+</head>
+<body>
+    <a href="{{url_for('registration_done')}}" class="btn btn-primary home-btn">🏠 Home</a>
+    
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="entry-card p-4">
+                    <h2 class="text-center mb-4">📊 Daily Carbon Footprint Entry</h2>
+                    
+                    <form action="/dailyentrypage" method="POST" id="dailyForm" >
+                        
+                        <!-- Transport Section -->
+                        <h5 class="transport-header section-header">🚗 Transport Details</h5>
+                        <div class="transport-section">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Mode of Transport <span class="text-danger">*</span></label>
+                                <select class="form-select" name="vehicle" required>
+                                    <option value="" selected disabled>Select Transport</option>
+                                    <option value="Car">Car</option>
+                                    <option value="Bus">Bus</option>
+                                    <option value="Train">Train</option>
+                                    <option value="Bicycle">Bicycle</option>
+                                    <option value="Walking">Walking</option>
+                                    <option value="Motorbike">Motorbike</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Distance Travelled (km)</label>
+                                <input type="number" class="form-control" name="distance" 
+                                       placeholder="e.g., 25.5" min="0" max="1000" step="0.1">
+                                <!-- <div class="form-text">Maximum: 1000 km per day</div> -->
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Fuel Type <span class="text-danger">*</span></label>
+                                <select class="form-select" name="fuel" required>
+                                    <option value="" selected disabled>Select Fuel</option>
+                                    <option value="None">None</option>
+                                    <option value="Petrol">Petrol</option>
+                                    <option value="Diesel">Diesel</option>
+                                    <option value="Electric">Electric</option>
+                                    <option value="Hybrid">Hybrid</option>
+                                    <option value="CNG">CNG</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Years Owned</label>
+                                <input type="number" class="form-control" name="years_owned" 
+                                       placeholder="e.g., 5" min="0" max="50" step="1">
+                                <!-- <div class="form-text">0-50 years</div> -->
+                            </div>
+                        </div>
+
+                        </div>
+
+                        <!-- Diet Section -->
+                        <h5 class="diet-header section-header">🥗 Diet Information</h5>
+                        <div class="diet-section">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Diet Type <span class="text-danger">*</span></label>
+                                <select class="form-select" name="diet" required>
+                                    <option value="" selected disabled>Select Diet</option>
+                                    <option value="Vegetarian">Vegetarian</option>
+                                    <option value="Vegan">Vegan</option>
+                                    <option value="Non-Vegetarian">Non-Vegetarian</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Meals Per Day <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" name="meals" 
+                                       placeholder="e.g., 3" min="1" max="10" step="1" required>
+                                <!-- <div class="form-text">1-10 meals</div> -->
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Food Source <span class="text-danger">*</span></label>
+                                <select class="form-select" name="food_source" required>
+                                    <option value="" selected disabled>Select Source</option>
+                                    <option value="Local Market">Local Market</option>
+                                    <option value="Supermarket">Supermarket</option>
+                                    <option value="Home Grown">Home Grown</option>
+                                    <option value="Restaurant">Restaurant</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        </div>
+
+                        <!-- Utilities Section -->
+                        <h5 class="utility-header section-header">⚡ Utility Consumption</h5>
+                        <div class="utility-section">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Electricity Consumption (kWh)</label>
+                                <input type="number" class="form-control" name="electric_consumption" 
+                                       placeholder="e.g., 20" min="0" max="200" step="0.1">
+                                <!-- <div class="form-text">Daily usage, max 200 kWh</div> -->
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Water Consumption (L/day)</label>
+                                <input type="number" class="form-control" name="water_consumption" 
+                                       placeholder="e.g., 20" min="0" max="1000" step="1">
+                                <!-- <div class="form-text">Liters per day, max 1000L</div> -->
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Gas Usage (kg)</label>
+                                <input type="number" class="form-control" name="gas_consumption" 
+                                       placeholder="e.g., 2.5" min="0" max="50" step="0.1">
+                                <!-- <div class="form-text">Daily gas usage, max 50kg</div> -->
+                            </div>
+                        </div>
+
+                        <!-- Lifestyle Section -->
+                        <h5 class="lifestyle-header section-header">🏠 Lifestyle Habits</h5>
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Plastic Items Used</label>
+                                <input type="number" class="form-control" name="plastic_items" 
+                                       placeholder="e.g., 4" min="0" max="100" step="1">
+                                <!-- <div class="form-text">Count of items</div> -->
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Smoking (times/day)</label>
+                                <input type="number" class="form-control" name="smoking" 
+                                       placeholder="e.g., 5" min="0" max="100" step="1">
+                                <!-- <div class="form-text">Daily count</div> -->
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Alcohol (drinks/day)</label>
+                                <input type="number" class="form-control" name="alcohol_consumption" 
+                                       placeholder="e.g., 2" min="0" max="20" step="1">
+                                <!-- <div class="form-text">Standard drinks</div> -->
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Gym (hours/day)</label>
+                                <input type="number" class="form-control" name="gym" 
+                                       placeholder="e.g., 1.5" min="0" max="12" step="0.5">
+                                <!-- <div class="form-text">In 30-min increments</div> -->
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                🚀 Submit Daily Entry
+                            </button>
+                        </div>
+                        
+                        <div class="text-center mt-3">
+                            <small class="text-muted">
+                                <span class="text-danger">*</span> Required fields
+                            </small>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Form validation feedback
+        document.getElementById('dailyForm').addEventListener('submit', function(e) {
+            const form = this;
+            if (!form.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Focus on first invalid field
+                const firstInvalid = form.querySelector(':invalid');
+                if (firstInvalid) {
+                    firstInvalid.focus();
+                    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+            form.classList.add('was-validated');
+        });
+
+        // Real-time validation styling
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.checkValidity()) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                } else {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+</body>
+</html>

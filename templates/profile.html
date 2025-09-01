@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User Profile</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: url('/static/images/img.jpg') no-repeat center center fixed;
+      background-size: cover;
+    }
+    .profile-card {
+      max-width: 600px;
+      margin: 80px auto;
+      padding: 30px;
+      border-radius: 20px;
+      backdrop-filter: blur(12px);
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      color: white;
+    }
+    .profile-card h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .profile-info p {
+      font-size: 1.1rem;
+      margin: 5px 0;
+    }
+    /* Top right buttons - keeping your exact styling */
+    .top-right-buttons {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 10px;
+    }
+
+    /* Edit form styling - keeping your exact approach */
+    .edit-form {
+      display: none; /* Hidden by default */
+    }
+    
+    .edit-form .form-control {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #333;
+      margin-bottom: 10px;
+    }
+    
+    .edit-form .form-control:focus {
+      background: rgba(255, 255, 255, 0.95);
+      border-color: #007bff;
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    
+    .edit-form label {
+      color: white;
+      font-weight: bold;
+    }
+
+    /* Flash messages with your glassmorphism style */
+    .custom-alert {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      margin-bottom: 20px;
+      padding: 15px;
+      color: white;
+    }
+    
+    .custom-alert.success {
+      background: rgba(40, 167, 69, 0.2);
+      border-color: rgba(40, 167, 69, 0.3);
+    }
+    
+    .custom-alert.error {
+      background: rgba(220, 53, 69, 0.2);
+      border-color: rgba(220, 53, 69, 0.3);
+    }
+  </style>
+</head>
+<body>
+  
+  <!-- Top Right Buttons - keeping your exact structure -->
+  <div class="top-right-buttons">
+    <a href="/success" class="btn btn-light">Home</a>
+    <a href="/entries_overview" class="btn btn-info">Show Entries</a>
+    <a href="/logout" class="btn btn-danger">Logout</a>
+  </div>
+
+  <div class="profile-card">
+    <h2>User Profile</h2>
+    
+    <!-- Flash Messages with your styling -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="custom-alert {{ category }}">
+            {% if category == 'success' %}✅{% else %}❌{% endif %} {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    
+    <!-- DISPLAY MODE - keeping your exact layout -->
+    <div id="display-mode">
+      <div class="profile-info">
+        <p><strong>Name:</strong> {{ user.name }}</p>
+        <p><strong>Age:</strong> {{ user.age }}</p>
+        <p><strong>Gender:</strong> {{ user.gender }}</p>
+        <p><strong>Phone:</strong> {{ user.phone_no }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Password:</strong><b>***********</b></p>
+        <p><strong>Date Joined:</strong> {{ user.date_joined }}</p>
+      </div>
+      <!-- Edit button styled to match your theme -->
+      <div class="text-center mt-4">
+        <button class="btn btn-warning" onclick="showEditForm()">✏️ Edit Profile</button>
+        <button class="btn btn-danger ms-2" onclick="confirmDelete()">🗑️ Delete Account</button>
+      </div>
+    </div>
+    
+    <!-- EDIT MODE - keeping your exact structure and styling -->
+    <div id="edit-mode" class="edit-form">
+      <form method="POST" action="/update_profile">
+        <div class="profile-info">
+          <p><strong>Name:</strong><br>
+            <input type="text" class="form-control" name="name" value="{{ user.name }}" required>
+          </p>
+          
+          <p><strong>Age:</strong><br>
+            <input type="number" class="form-control" name="age" value="{{ user.age }}" min="1" max="120" required>
+          </p>
+          
+          <p><strong>Gender:</strong><br>
+            <select class="form-control" name="gender" required>
+              <option value="Male" {% if user.gender == 'Male' %}selected{% endif %}>Male</option>
+              <option value="Female" {% if user.gender == 'Female' %}selected{% endif %}>Female</option>
+              <option value="Other" {% if user.gender == 'Other' %}selected{% endif %}>Other</option>
+            </select>
+          </p>
+          
+          <p><strong>Username:</strong> {{ user.username }} <em>(cannot be changed)</em></p>
+          <p><strong>Password:</strong><br>
+            <input type="password" class="form-control" name="password" value="{{ user.user_password }}" required>
+          </p>
+          <p><strong>Phone:</strong><br>
+            <input type="tel" class="form-control" name="phone_no" value="{{ user.phone_no }}" required>
+          </p>
+          
+          <p><strong>Email:</strong><br>
+            <input type="email" class="form-control" name="email" value="{{ user.email }}" required>
+          </p>
+          
+          <p><strong>Date Joined:</strong> {{ user.date_joined }}</p>
+        </div>
+        
+        <div class="text-center mt-4">
+          <button type="submit" class="btn btn-success">💾 Save Changes</button>
+          <button type="button" class="btn btn-secondary ms-2" onclick="hideEditForm()">❌ Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Only adding Bootstrap JS for potential future use - not changing any functionality -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function showEditForm() {
+      document.getElementById('display-mode').style.display = 'none';
+      document.getElementById('edit-mode').style.display = 'block';
+    }
+
+    function hideEditForm() {
+      document.getElementById('edit-mode').style.display = 'none';
+      document.getElementById('display-mode').style.display = 'block';
+    }
+
+    function confirmDelete() {
+      if (confirm('⚠️ Are you sure you want to delete your account?\n\nThis will permanently delete:\n• Your profile\n• All your daily entries\n• All your data\n\nThis action cannot be undone!')) {
+        // Create a form and submit it
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/delete_profile';
+        document.body.appendChild(form);
+        form.submit();
+      }
+    }
+  </script>
+
+</body>
+</html>
+
+

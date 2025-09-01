@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sign Up Form</title>
+
+    <!-- Bootstrap 5 CDN -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --footer-bg: #2c3e50;
+        --navbar-bg: rgba(31, 31, 31, 0.6);
+        --text-light: #ffffff;
+        --footer-height: 64px;
+        --glow-color: 0, 200, 180; /* teal for submit */
+        --reset-glow-color: 255, 0, 0; /* red for reset */
+        --nav-glow-color: 255, 80, 180; /* pink for navbar */
+      }
+
+      html,
+      body {
+        height: 100%;
+        min-height: 100%;
+        margin: 0;
+        font-family: system-ui, sans-serif;
+
+        background: url("/static/images/img.jpg") no-repeat center center fixed;
+        background-size: cover;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .navbar-custom {
+        backdrop-filter: blur(8px);
+        background-color: var(--navbar-bg);
+      }
+
+      .navbar-custom .nav-link {
+        color: var(--text-light) !important;
+        position: relative;
+        display: inline-block;
+        padding: 0.375rem 0.6rem;
+        border-radius: 6px;
+        transition: box-shadow 0.25s ease, transform 0.15s ease,
+          color 0.15s ease;
+      }
+
+      .navbar-custom .nav-link::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        box-shadow: 0 6px 18px rgba(var(--nav-glow-color), 0.06);
+        opacity: 0;
+        transition: opacity 0.25s ease, box-shadow 0.25s ease,
+          transform 0.25s ease;
+        pointer-events: none;
+      }
+
+      .navbar-custom .nav-link:hover,
+      .navbar-custom .nav-link:focus {
+        color: var(--text-light) !important;
+        transform: translateY(-3px);
+      }
+
+      .navbar-custom .nav-link:hover::after,
+      .navbar-custom .nav-link:focus::after {
+        opacity: 1;
+        box-shadow: 0 18px 50px rgba(var(--nav-glow-color), 0.36),
+          0 0 80px rgba(var(--nav-glow-color), 0.22);
+      }
+
+      main {
+        flex: 1;
+        padding: 2.5rem 0;
+        padding-bottom: calc(var(--footer-height) + 2rem);
+      }
+
+      .form-container {
+        backdrop-filter: blur(10px);
+        background-color: rgba(255, 255, 255, 0.18);
+        border-radius: 15px;
+        padding: 1.75rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        margin-bottom: 1rem;
+      }
+
+      label,
+      .text-white,
+      .footer-custom a {
+        color: var(--text-light);
+      }
+
+      .footer-custom {
+        backdrop-filter: blur(10px);
+        background-color: rgba(44, 62, 80, 0.5);
+        text-align: center;
+        padding: 0.6rem 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+        height: var(--footer-height);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .footer-custom .links {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+      }
+
+      .footer-custom a {
+        margin: 0 0.25rem;
+        text-decoration: none;
+      }
+
+      .footer-custom a:hover {
+        text-decoration: underline;
+      }
+
+      .form-actions {
+        display: flex;
+        justify-content: center;
+        gap: 0.75rem;
+        margin-top: 0.5rem;
+      }
+
+      button,
+      .navbar-toggler {
+        align-items: center;
+        border: 0;
+        border-radius: 10px;
+        color: #ffffff;
+        display: inline-flex;
+        font-size: 14px;
+        justify-content: center;
+        min-width: 120px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: box-shadow 0.25s ease, transform 0.15s ease,
+          opacity 0.15s ease;
+        overflow: visible;
+      }
+
+      /* Submit button (teal glow) */
+      button[type="submit"] {
+        background-image: linear-gradient(
+          144deg,
+          #af40ff,
+          #5b42f3 50%,
+          #00ddeb
+        );
+        box-shadow: 0 0 10px rgba(var(--glow-color), 0.5),
+          0 0 20px rgba(var(--glow-color), 0.3);
+      }
+
+      button[type="submit"]:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0 20px rgba(var(--glow-color), 0.8),
+          0 0 40px rgba(var(--glow-color), 0.6);
+      }
+
+      /* Reset button (red glow) */
+      #resetBtn {
+        background-image: linear-gradient(
+          144deg,
+          #ff4d4d,
+          #ff1a1a 50%,
+          #cc0000
+        );
+        box-shadow: 0 0 10px rgba(var(--reset-glow-color), 0.5),
+          0 0 20px rgba(var(--reset-glow-color), 0.3);
+      }
+
+      #resetBtn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0 20px rgba(var(--reset-glow-color), 0.8),
+          0 0 40px rgba(var(--reset-glow-color), 0.6);
+      }
+
+      button:active {
+        transform: scale(0.98);
+      }
+
+      .form-actions button {
+        padding: 0;
+      }
+
+      .navbar-toggler {
+        padding: 6px 10px;
+        min-width: auto;
+        background: transparent;
+        box-shadow: none;
+      }
+
+      @media (max-width: 576px) {
+        .form-container {
+          padding: 1rem;
+        }
+        button {
+          min-width: 100px;
+          font-size: 13px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+      <div class="container-fluid">
+        <a class="navbar-brand text-white" href="#">MyApp</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navMenu"
+          aria-controls="navMenu"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse justify-content-end" id="navMenu">
+          <ul class="navbar-nav align-items-center">
+            <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container d-flex justify-content-center align-items-start">
+      <div class="col-12 col-md-6 col-lg-5 form-container">
+        <h3 class="text-center text-white mb-3">Create Your Account</h3>
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %}
+        <div class="mb-3">
+          {% for category, message in messages %}
+          <div
+            class="alert alert-{{ 'danger' if category == 'danger' else 'success' }} alert-dismissible fade show"
+            role="alert"
+          >
+            {{ message }}
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="alert"
+              aria-label="Close"
+            ></button>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %} {% endwith %}
+
+        <form
+          id="signupForm"
+          action="/register"
+          method="POST"
+          autocomplete="on"
+          novalidate
+        >
+          <!-- Name -->
+          <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input
+              type="text"
+              id="name"
+              class="form-control"
+              name="name"
+              placeholder="Enter your name"
+              minlength="4"
+              maxlength="16"
+              required
+            />
+            <div class="valid-feedback">Looks good!</div>
+            <div class="invalid-feedback">
+              Name must be between 3 and 16 characters.
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="mb-3">
+            <label for="email" class="form-label">Email Address</label>
+            <input
+              type="text"
+              id="email"
+              class="form-control"
+              name="email"
+              placeholder="Enter your email"
+              minlength="5"
+              maxlength="26"
+              required
+            />
+            <div class="valid-feedback">Valid email!</div>
+            <div class="invalid-feedback">
+              Please enter a valid email address.
+            </div>
+          </div>
+
+          <!-- Phone -->
+          <div class="mb-3">
+            <label for="phone" class="form-label">Phone Number</label>
+            <input
+              type="tel"
+              id="phone"
+              class="form-control"
+              name="phone"
+              placeholder="Enter your phone number"
+              pattern="^(?!(\\d)\\1{9}$)(?!1234567890$)(?!9876543210$)(?!9898989898$)(?!7878787878$)(?!5656565656$)(?!1212121212$)(?!2323232323$)(?!4545454545$)(?!6767676767$)(?!8989898989$)[6-9][0-9]{9}$"
+              minlength="10"
+              maxlength="10"
+              title="Enter a valid Indian 10-digit phone number (not all identical, sequential, or repeating patterns)"
+              required
+            />
+            <div class="valid-feedback">Looks good!</div>
+            <div class="invalid-feedback">
+              Enter a valid Indian 10-digit phone number (cannot be all
+              identical digits, sequential, or repeating patterns).
+            </div>
+          </div>
+
+          <!-- Age -->
+          <div class="mb-3">
+            <label for="age" class="form-label">Age</label>
+            <input
+              type="number"
+              id="age"
+              name="age"
+              class="form-control"
+              placeholder="Enter your age"
+              min="18"
+              max="90"
+              required
+            />
+            <div class="valid-feedback">Looks good!</div>
+            <div class="invalid-feedback">Age must be between 18 and 90.</div>
+          </div>
+
+          <!-- Gender -->
+          <div class="mb-3">
+            <label for="gender" class="form-label">Gender</label>
+            <select id="gender" name="gender" class="form-select" required>
+              <option value="" disabled selected>Select Gender</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Other</option>
+            </select>
+            <div class="valid-feedback">Looks good!</div>
+            <div class="invalid-feedback">Please select your gender.</div>
+          </div>
+
+          <!-- Username -->
+          <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input
+              type="text"
+              id="username"
+              class="form-control"
+              name="username"
+              placeholder="Enter your username"
+              minlength="8"
+              maxlength="10"
+              required
+            />
+            <div class="valid-feedback">Looks good!</div>
+            <div class="invalid-feedback">
+              Username must be 8–10 characters long.
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input
+              type="password"
+              id="password"
+              class="form-control"
+              name="password"
+              placeholder="Enter password"
+              pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,12}$"
+              minlength="8"
+              maxlength="12"
+              title="Password must be 8-12 characters, include uppercase, lowercase, a number, and a special character."
+              required
+            />
+            <div class="valid-feedback">Strong password!</div>
+            <div class="invalid-feedback">
+              Password must be 8–12 characters and include uppercase, lowercase,
+              number, and special character.
+            </div>
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="mb-3">
+            <label for="confirmPassword" class="form-label"
+              >Confirm Password</label
+            >
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              class="form-control"
+              placeholder="Re-enter password"
+              minlength="8"
+              maxlength="12"
+              required
+            />
+            <div class="valid-feedback">Passwords match!</div>
+            <div class="invalid-feedback">Passwords do not match.</div>
+          </div>
+
+          <!-- Submit + Reset (horizontal, smaller) -->
+          <div class="form-actions">
+            <button type="submit">Submit</button>
+            <button type="button" id="resetBtn">Reset</button>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <footer class="footer-custom">
+      <div
+        class="container d-flex flex-column flex-md-row align-items-center justify-content-center gap-3"
+      >
+        <p class="mb-0">© 2025 Company, Inc</p>
+        <div class="links">
+          <a href="#" aria-label="Instagram">Instagram</a>
+          <a href="#" aria-label="Facebook">Facebook</a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      const signupForm = document.getElementById("signupForm");
+      const password = document.getElementById("password");
+      const confirmPassword = document.getElementById("confirmPassword");
+      const email = document.getElementById("email");
+      const phone = document.getElementById("phone");
+
+      // Debounce function to delay validation
+      function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+          const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+          };
+          clearTimeout(timeout);
+          timeout = setTimeout(later, wait);
+        };
+      }
+
+      // Password matching validation function
+      function validatePasswordMatch() {
+        const pwd = password.value;
+        const confirmPwd = confirmPassword.value;
+        
+        // Only validate if both fields have content
+        if (pwd && confirmPwd) {
+          if (pwd === confirmPwd) {
+            confirmPassword.setCustomValidity("");
+            confirmPassword.classList.remove("is-invalid");
+            confirmPassword.classList.add("is-valid");
+          } else {
+            confirmPassword.setCustomValidity("Passwords do not match");
+            confirmPassword.classList.remove("is-valid");
+            confirmPassword.classList.add("is-invalid");
+          }
+        } else if (confirmPwd) {
+          // If confirm password has content but original password is empty
+          confirmPassword.setCustomValidity("Please enter password first");
+          confirmPassword.classList.remove("is-valid");
+          confirmPassword.classList.add("is-invalid");
+        } else {
+          // Clear validation if confirm password is empty
+          confirmPassword.setCustomValidity("");
+          confirmPassword.classList.remove("is-valid", "is-invalid");
+        }
+      }
+
+      // Debounced version of password validation
+      const debouncedPasswordValidation = debounce(validatePasswordMatch, 300);
+
+      // Form submission validation
+      signupForm.addEventListener("submit", function (e) {
+        // Always validate password match on submit
+        validatePasswordMatch();
+        
+        if (!signupForm.checkValidity()) {
+          e.preventDefault();
+          e.stopPropagation();
+
+          // Focus on first invalid field
+          const firstInvalid = signupForm.querySelector(":invalid");
+          if (firstInvalid) {
+            firstInvalid.focus();
+            firstInvalid.scrollIntoView({
+              behavior: "smooth",
+              block: "center",
+            });
+          }
+        }
+        signupForm.classList.add("was-validated");
+      });
+
+      // Enhanced input validation for all fields
+      document.querySelectorAll("input, select").forEach((input) => {
+        input.addEventListener("input", function () {
+          // Clear custom validity first
+          this.setCustomValidity("");
+          
+          if (this.id === "confirmPassword") {
+            // Use debounced validation for confirm password
+            debouncedPasswordValidation();
+          } else if (this.id === "password") {
+            // When password changes, revalidate confirm password if it has content
+            if (confirmPassword.value) {
+              debouncedPasswordValidation();
+            }
+            // Validate the password field itself
+            validateField(this);
+          } else if (this.id === "email") {
+            const emailPattern = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,63}$/;
+            if (this.value && !emailPattern.test(this.value)) {
+              this.setCustomValidity("Invalid email address");
+            }
+            validateField(this);
+          } else if (this.id === "phone") {
+            const phonePattern = /^(?!(\d)\1{9}$)(?!1234567890$)(?!9876543210$)(?!9898989898$)(?!7878787878$)(?!5656565656$)(?!1212121212$)(?!2323232323$)(?!4545454545$)(?!6767676767$)(?!8989898989$)[6-9][0-9]{9}$/;
+            if (this.value && !phonePattern.test(this.value)) {
+              this.setCustomValidity("Invalid phone number");
+            }
+            validateField(this);
+          } else {
+            validateField(this);
+          }
+        });
+
+        // Also validate on blur for better UX
+        input.addEventListener("blur", function() {
+          if (this.id === "confirmPassword") {
+            validatePasswordMatch();
+          }
+        });
+      });
+
+      // Generic field validation function
+      function validateField(field) {
+        if (field.checkValidity()) {
+          field.classList.remove("is-invalid");
+          field.classList.add("is-valid");
+        } else {
+          field.classList.remove("is-valid");
+          field.classList.add("is-invalid");
+        }
+      }
+
+      // Reset button functionality
+      document.getElementById("resetBtn").addEventListener("click", function () {
+        signupForm.reset();
+        signupForm.classList.remove("was-validated");
+        
+        // Clear all validation classes and custom validity
+        document.querySelectorAll(".is-valid, .is-invalid").forEach((el) => {
+          el.classList.remove("is-valid", "is-invalid");
+          el.setCustomValidity("");
+        });
+      });
+    </script>
+  </body>
+</html>
