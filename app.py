@@ -1,7 +1,6 @@
-from os import error
 from flask import Flask, flash, redirect, render_template, request, session, url_for
 import pymysql
-import random
+
 from datetime import date
 import re
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -146,17 +145,16 @@ def register():
             return render_template("Login.html")
 
 
-def calculate_points(carbon_score):
-    
-    if carbon_score <= 10:
-        return 100   # Excellent
-    elif carbon_score <= 20:
-        return 75    # Good
-    elif carbon_score <= 40:
-        return 50    # Average
-    else:
-        return 25    # Needs improvement
+def calculate_green_points(carbon_score):
 
+    if carbon_score <= 10:
+        return 100  # Excellent
+    elif carbon_score <= 20:
+        return 75  # Good
+    elif carbon_score <= 40:
+        return 50  # Average
+    else:
+        return 25  # Needs improvement
 
 
 def calculate_carbon_score(form_data):
@@ -168,15 +166,15 @@ def calculate_carbon_score(form_data):
     mode = form_data.get("commute_mode", "")
 
     if mode == "Car":
-        total_carbon += distance * 0.2  
+        total_carbon += distance * 0.2
     elif mode == "Bike":
-        total_carbon += distance * 0.1  
+        total_carbon += distance * 0.1
     elif mode == "Public-Transport":
-        total_carbon += distance * 0.08  
+        total_carbon += distance * 0.08
     elif mode == "Train":
-        total_carbon += distance * 0.04 
+        total_carbon += distance * 0.04
     elif mode == "Flight":
-        total_carbon += distance * 0.15 + 50  
+        total_carbon += distance * 0.15 + 50
     # Walk / Cycle = 0
     else:
         total_carbon += 0
@@ -184,14 +182,13 @@ def calculate_carbon_score(form_data):
     # Work Location
     work_location = form_data.get("work_location", "")
     if work_location == "Home":
-        total_carbon += 1    
+        total_carbon += 1
     elif work_location == "Office":
-        total_carbon += 3    
+        total_carbon += 3
     elif work_location == "Travel":
-        total_carbon += 5    
+        total_carbon += 5
     elif work_location == "Other":
-        total_carbon += 2    
-
+        total_carbon += 2
 
     # Diet
     diet = form_data.get("diet", "")
@@ -227,7 +224,7 @@ def calculate_carbon_score(form_data):
         total_carbon += 2
     elif digital == "Intensive":
         total_carbon += 3
-    #Printing Intensity
+    # Printing Intensity
     printing = form_data.get("printing_level", "")
     if printing == "Minimal":
         total_carbon += 0.5
@@ -237,8 +234,6 @@ def calculate_carbon_score(form_data):
         total_carbon += 2
 
     return round(total_carbon, 2)
-
-
 
 
 @app.route("/dailyentrypage", methods=["GET", "POST"])
@@ -261,12 +256,11 @@ def daily_user_entry():
         cursor.execute("SELECT id FROM SignupDetails WHERE username = %s", (username,))
         id = cursor.fetchone()
         user_id = id["id"]
-        print(type(user_id))
-        carbon = calculate_carbon_score(request.form)
-        print(type(carbon))
 
-        reward_points=calculate_points(carbon)
-        print(type(reward_points))
+        carbon = calculate_carbon_score(request.form)
+
+        reward_points = calculate_green_points(carbon)
+
         # Get form data
         work_location = request.form.get("work_location")
         vehicle_type = request.form.get("commute_mode")
@@ -278,9 +272,12 @@ def daily_user_entry():
 
         # Insert into detail tables and get the LAST INSERT IDs
         print("Checkpoint-1")
-        cursor.execute("INSERT INTO EmployeePoints(user_id,points_earned,date_earned)VALUES(%s,%s,%s)",(user_id,reward_points,date.today()))
+        cursor.execute(
+            "INSERT INTO EmployeePoints(user_id,points_earned,date_earned)VALUES(%s,%s,%s)",
+            (user_id, reward_points, date.today()),
+        )
 
-        employee_point_id=cursor.lastrowid
+        employee_point_id = cursor.lastrowid
 
         cursor.execute(
             "INSERT INTO TransportDetails(user_id,mode_of_transport,distance_travelled,work_location) VALUES(%s,%s,%s,%s)",
@@ -317,8 +314,10 @@ def daily_user_entry():
 
         db.commit()
         cursor.close()
-        message=flash("Your daily entry has been added successfully")
-        return render_template("daily_entry_status.html", name=username,message=message)
+        message = flash("Your daily entry has been added successfully")
+        return render_template(
+            "daily_entry_status.html", name=username, message=message
+        )
 
 
 @app.route("/success")
@@ -374,7 +373,7 @@ def entries_overview():
 def view_single_entry(entry_id):
     cursor = db.cursor()
     cursor.execute(
-        "SELECT d.*,t.mode_of_transport,t.distance_travelled,t.work_location,di.diet_type,di.food_source,l.digital_footprint,l.printing_today,e.daily_entry_id,e.points_earned FROM DailyEntry d JOIN "
+        "SELECT d.*,t.mode_of_transport,t.distance_travelled,t.work_location,di.diet_type,di.food_source,l.digital_footprint,l.printing_today,e.points_earned FROM DailyEntry d JOIN "
         "TransportDetails t ON d.transport_ref_id = t.transport_id JOIN DietDetails di ON d.diet_ref_id = di.diet_id JOIN LifestyleHabits l ON d.lifestyle_ref_id = l.lifestyle_id JOIN EmployeePoints e ON d.user_point_id_ref = e.emp_point_id WHERE d.daily_id = %s",
         (entry_id,),
     )
@@ -390,22 +389,26 @@ def delete_entry(entry_id):
     daily_dict = cursor.fetchone()
     if not daily_dict:
         return redirect(url_for("entries_overview.html"))
-    cursor.execute("DELETE FROM DailyEntry WHERE daily_id = %s", (entry_id,))
-    cursor.execute(
-        "DELETE FROM TransportDetails WHERE transport_id = %s",
-        (daily_dict["transport_ref_id"],),
-    )
-    cursor.execute(
-        "DELETE FROM DietDetails WHERE diet_id = %s", (daily_dict["diet_ref_id"],)
-    )
-    cursor.execute(
-        "DELETE FROM LifestyleHabits WHERE lifestyle_id = %s",
-        (daily_dict["lifestyle_ref_id"],),
-    )
-    cursor.execute(
-        "DELETE FROM UtilityUsage WHERE utility_id = %s",
-        (daily_dict["utility_ref_id"],),
-    )
+
+    else:
+        cursor.execute("DELETE FROM DailyEntry WHERE daily_id = %s", (entry_id,))
+
+        cursor.execute(
+            "DELETE FROM EmployeePoints WHERE emp_point_id = %s",
+            (daily_dict["user_point_id_ref"]),
+        )
+        cursor.execute(
+            "DELETE FROM TransportDetails WHERE transport_id = %s",
+            (daily_dict["transport_ref_id"],),
+        )
+        cursor.execute(
+            "DELETE FROM DietDetails WHERE diet_id = %s", (daily_dict["diet_ref_id"],)
+        )
+        cursor.execute(
+            "DELETE FROM LifestyleHabits WHERE lifestyle_id = %s",
+            (daily_dict["lifestyle_ref_id"],),
+        )
+
     db.commit()
     cursor.close()
 
@@ -425,8 +428,8 @@ def edit_entry(entry_id):
         a = cursor.fetchone()
         user_id = a["id"]
         cursor.execute(
-            "SELECT d.*,t.mode_of_transport,t.distance_travelled,t.fuel_type,t.years_owned,di.diet_type,di.meals_per_day,di.food_source,l.plastic_item_used,l.alcohol_consume,l.smoking,l.gym_hours,u.electricity_consumption,u.water_consumption,u.gas_usage FROM DailyEntry d JOIN "
-            "TransportDetails t ON d.transport_ref_id = t.transport_id JOIN DietDetails di ON d.diet_ref_id = di.diet_id JOIN UtilityUsage u ON d.utility_ref_id = u.utility_id JOIN LifestyleHabits l ON d.lifestyle_ref_id = l.lifestyle_id  WHERE d.daily_id = %s",
+            "SELECT d.*,t.mode_of_transport,t.distance_travelled,t.work_location,di.diet_type,di.food_source,l.digital_footprint,l.printing_today,e.points_earned FROM DailyEntry d JOIN "
+            "TransportDetails t ON d.transport_ref_id = t.transport_id JOIN DietDetails di ON d.diet_ref_id = di.diet_id JOIN LifestyleHabits l ON d.lifestyle_ref_id = l.lifestyle_id JOIN EmployeePoints e ON d.user_point_id_ref = e.emp_point_id WHERE d.daily_id = %s",
             (entry_id,),
         )
         entry = cursor.fetchone()
@@ -435,72 +438,51 @@ def edit_entry(entry_id):
             return redirect(url_for("entries_overview"))
         if request.method == "GET":
             return render_template("edit_entry.html", entry=entry)
+
+        carbon = calculate_carbon_score(request.form)
+        reward_points = calculate_green_points(carbon)
         form_data = {
-            "vehicle_type": request.form.get("vehicle"),
-            "distance_travelled": float(request.form.get("distance", 0) or 0),
-            "fuel_type": request.form.get("fuel"),
-            "years_owned": float(request.form.get("years_owned", 0) or 0),
+            "vehicle_type": request.form.get("commute_mode"),
+            "work_location": request.form.get("work_location"),
+            "distance_travelled": float(request.form.get("commute_distance", 0) or 0),
             "diet_type": request.form.get("diet"),
-            "meals_per_day": float(request.form.get("meals", 0) or 0),
-            "food_source": request.form.get("food_source"),
-            "electricity_consume": float(
-                request.form.get("electric_consumption", 0) or 0
-            ),
-            "water_consume": float(request.form.get("water_consumption", 0) or 0),
-            "gas_consume": float(request.form.get("gas_consumption", 0) or 0),
-            "plastic": float(request.form.get("plastic_items", 0) or 0),
-            "alcohol_consume": float(request.form.get("alcohol_consumption", 0) or 0),
-            "smoking": float(request.form.get("smoking", 0) or 0),
-            "gym_hours": float(request.form.get("gym", 0) or 0),
+            "food_source": request.form.get("meal_source"),
+            "digital_footprint": request.form.get("digital_intensity"),
+            "printing_done": request.form.get("printing_level"),
+            "carbon_score": carbon,
+            "reward_points": reward_points,
         }
+
         cursor.execute(
-            "UPDATE TransportDetails SET mode_of_transport=%s, distance_travelled=%s, fuel_type=%s, years_owned=%s WHERE transport_id=%s",
+            "UPDATE TransportDetails SET mode_of_transport=%s, distance_travelled=%s,work_location = %s WHERE transport_id=%s",
             (
                 form_data["vehicle_type"],
                 form_data["distance_travelled"],
-                form_data["fuel_type"],
-                form_data["years_owned"],
+                form_data["work_location"],
                 entry["transport_ref_id"],
             ),
         )
 
         cursor.execute(
-            "UPDATE DietDetails SET diet_type=%s, meals_per_day=%s, food_source=%s WHERE diet_id=%s",
+            "UPDATE DietDetails SET diet_type=%s, food_source=%s WHERE diet_id=%s",
             (
                 form_data["diet_type"],
-                form_data["meals_per_day"],
                 form_data["food_source"],
                 entry["diet_ref_id"],
             ),
         )
-
         cursor.execute(
-            "UPDATE UtilityUsage SET electricity_consumption=%s, water_consumption=%s, gas_usage=%s WHERE utility_id=%s",
-            (
-                form_data["electricity_consume"],
-                form_data["water_consume"],
-                form_data["gas_consume"],
-                entry["utility_ref_id"],
-            ),
+            " UPDATE EmployeePoints SET points_earned = %s,date_earned = %s WHERE emp_point_id = %s",
+            (form_data["reward_points"], date.today(), entry["user_point_id_ref"]),
         )
 
-        cursor.execute(
-            "UPDATE LifestyleHabits SET plastic_item_used=%s, alcohol_consume=%s, smoking=%s, gym_hours=%s WHERE lifestyle_id=%s",
-            (
-                form_data["plastic"],
-                form_data["alcohol_consume"],
-                form_data["smoking"],
-                form_data["gym_hours"],
-                entry["lifestyle_ref_id"],
-            ),
-        )
         cursor.execute(
             "UPDATE DailyEntry SET carbon_score=%s WHERE daily_id=%s",
-            (entry["carbon_score"], entry_id),
+            (form_data["carbon_score"], entry_id),
         )
         db.commit()
         cursor.close()
-        # flash("Entry updated successfully!","success")
+        flash("Entry updated successfully!", "success")
 
         return redirect(url_for("view_single_entry", entry_id=entry_id))
     except Exception as e:
@@ -508,6 +490,40 @@ def edit_entry(entry_id):
         flash("Failed to update entry", "error")
 
         return redirect(url_for("entries_overview"))
+
+
+@app.route("/leaderboard", methods=["GET", "POST"])
+def user_leaderboard():
+    username = session.get("username", None)
+    if not username:
+        return redirect(url_for("login"))
+    else:
+        cursor = db.cursor()
+
+        cursor.execute(
+            """
+            SELECT s.name,s.username,SUM(emp.points_earned) as total_points,COUNT(de.daily_id) as total_entries,
+            AVG(de.carbon_score) as avg_carbon_score 
+            FROM SignupDetails s JOIN EmployeePoints emp ON s.id=emp.user_id JOIN DailyEntry de ON s.id = de.signup_ref_id GROUP BY s.id,s.name,s.username ORDER BY total_points DESC LIMIT 10
+        """
+        )
+
+        top_users = cursor.fetchall()
+        print(top_users)
+        cursor.execute("SELECT id FROM SignupDetails WHERE username = %s", (username,))
+        user_result = cursor.fetchone()
+        
+        if user_result:
+            user_id = user_result["id"]
+
+            cursor.execute(
+                "SELECT SUM(emp.points_earned) as my_points,COUNT(de.daily_id) as my_entries,AVG (de.carbon_score) as my_avg_carbon FROM EmployeePoints emp JOIN DailyEntry de ON emp.user_id = de.signup_ref_id WHERE emp.user_id = %s",
+                (user_id,),
+            )
+            current_user_stats=cursor.fetchone()
+        cursor.close()
+
+        return render_template("leaderboard.html",top_users=top_users,current_user_stats=current_user_stats,username=username)
 
 
 @app.route("/update_profile", methods=["POST"])

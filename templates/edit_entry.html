@@ -312,8 +312,8 @@
                 </div>
                 <div class="col-md-12 mb-3">
                   <label class="form-label">Distance Travelled (km)</label>
-                  <input type="number" class="form-control" name="commute_distance" value="{{ entry.distance_travelled }}" min="0" max="20000" step="1" required />
-                  <div class="invalid-feedback">Enter a distance between 0 and 20,000 km.</div>
+                  <input type="number" class="form-control" name="commute_distance" value="{{ entry.distance_travelled }}" min="0" max="1000" step="any" required />
+                  <div class="invalid-feedback">Enter a distance between 0 and 1000 km.</div>
                 </div>
               </div>
 

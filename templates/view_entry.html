@@ -312,7 +312,7 @@
       <div class="row justify-content-center">
         <div class="col-lg-8">
           <div class="entry-card p-4">
-            <h2 class="text-center mb-4 hero-neon">
+            <h2 class="text-center mb-4" style="color: #00e0b8; text-shadow: 0 0 6px #00e0b8, 0 0 12px #00e0b8, 0 0 24px #00e0b8; animation: heroPulse 3s infinite ease-in-out;">
               Daily Carbon Entry Details
             </h2>
 
@@ -374,7 +374,12 @@
             </div>
 
             <!-- Carbon Score & Summary -->
-            <h5 class="summary-header section-header">Carbon Summary</h5>
+            <div class="summary-header section-header">
+              <div class="neon-sign">
+                <div class="sign-content">
+                </div>
+              </div>
+            </div>
             <div class="row">
               <div class="col-12 mb-3">
                 <div class="data-card summary-data">
@@ -396,7 +401,7 @@
               </div>
               <div class="col-md-6 mb-2">
                 <div class="d-grid">
-                  <a href="{{ url_for('dailyentrypage') }}" class="btn-neon">
+                  <a href="{{ url_for('daily_user_entry') }}" class="btn-neon">
                     Add New Entry
                   </a>
                 </div>

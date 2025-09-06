@@ -232,6 +232,11 @@
               >
             </li>
             <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('user_leaderboard') }}">
+                <i class="fas fa-trophy me-1"></i>Leaderboard
+              </a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link" href="{{ url_for('profile') }}">Profile</a>
             </li>
             <li class="nav-item">
@@ -343,12 +348,12 @@
                     name="commute_distance"
                     placeholder="Enter total km"
                     min="0"
-                    max="20000"
-                    step="1"
+                    max="1000"
+                    step="any"
                     required
                   />
                   <div class="invalid-feedback">
-                    Enter a distance between 0 and 20,000 km.
+                    Enter a distance between 0 and 1000 km.
                   </div>
                 </div>
               </div>

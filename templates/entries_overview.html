@@ -106,7 +106,8 @@
       .entry-row:hover {
         transform: translateY(-2px) scale(1.01);
         background: rgba(0, 191, 255, 0.12);
-        box-shadow: 0 8px 24px rgba(0, 191, 255, 0.3), 0 0 20px rgba(0, 191, 255, 0.2);
+        box-shadow: 0 8px 24px rgba(0, 191, 255, 0.3),
+          0 0 20px rgba(0, 191, 255, 0.2);
         border: 1px solid rgba(0, 191, 255, 0.4);
       }
 
@@ -265,7 +266,12 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
-        
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('user_leaderboard') }}">
+                <i class="fas fa-trophy me-1"></i>Leaderboard
+              </a>
+            </li>
+
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('daily_user_entry') }}"
                 >Home</a
@@ -289,7 +295,7 @@
         <div class="col-lg-10">
           <div class="entries-container p-4">
             <h2 class="text-center mb-4 hero-neon">Your Daily Entries</h2>
-            
+
             <!-- Create Entry Button -->
             <div class="text-center mb-4">
               <a href="{{url_for('daily_user_entry')}}" class="btn btn-create">
@@ -308,8 +314,8 @@
               <div class="col-md-4">
                 <div class="stat-card">
                   <div class="stat-value">
-                    {% set total_score = entries|sum(attribute='carbon_score') %}
-                    {{ "%.1f"|format(total_score) }}
+                    {% set total_score = entries|sum(attribute='carbon_score')
+                    %} {{ "%.1f"|format(total_score) }}
                   </div>
                   <div class="stat-label">Total Carbon Score</div>
                 </div>
@@ -317,8 +323,8 @@
               <div class="col-md-4">
                 <div class="stat-card">
                   <div class="stat-value">
-                    {% set total_points = entries|sum(attribute='points_earned') %}
-                    {{ total_points }}
+                    {% set total_points = entries|sum(attribute='points_earned')
+                    %} {{ total_points }}
                   </div>
                   <div class="stat-label">Total Green Points</div>
                 </div>
@@ -327,39 +333,49 @@
 
             <!-- Entries List -->
             <div class="entries-list">
-              {% if entries %}
-                {% for entry in entries %}
-                <div class="entry-row">
-                  <div
-                    class="entry-content"
-                    onclick="location.href='/entry/{{ entry.daily_id }}'"
+              {% if entries %} {% for entry in entries %}
+              <div class="entry-row">
+                <div
+                  class="entry-content"
+                  onclick="location.href='/entry/{{ entry.daily_id }}'"
+                >
+                  <span><strong>Date:</strong> {{ entry.date_of_entry }}</span>
+                  <span
+                    ><strong>Carbon Score:</strong> {{ entry.carbon_score
+                    }}</span
                   >
-                    <span><strong>Date:</strong> {{ entry.date_of_entry }}</span>
-                    <span><strong>Carbon Score:</strong> {{ entry.carbon_score }}</span>
-                    <span><strong>Green Points:</strong> {{ entry.points_earned }}</span>
-                  </div>
-                  <div class="entry-actions">
-                    <a
-                      href="{{url_for('edit_entry', entry_id = entry.daily_id)}}"
-                      class="btn btn-edit"
-                      >Edit</a
-                    >
-                    <a
-                      href="{{url_for('delete_entry', entry_id = entry.daily_id)}}"
-                      class="btn btn-delete"
-                      >Delete</a
-                    >
-                  </div>
+                  <span
+                    ><strong>Green Points:</strong> {{ entry.points_earned
+                    }}</span
+                  >
                 </div>
-                {% endfor %}
-              {% else %}
-                <div class="empty-state">
-                  <h4>No Entries Yet</h4>
-                  <p>Start tracking your carbon footprint by creating your first daily entry!</p>
-                  <a href="{{url_for('daily_user_entry')}}" class="btn btn-create">
-                    Create Your First Entry
-                  </a>
+                <div class="entry-actions">
+                  <a
+                    href="{{url_for('edit_entry', entry_id = entry.daily_id)}}"
+                    class="btn btn-edit"
+                    >Edit</a
+                  >
+                  <a
+                    href="{{url_for('delete_entry', entry_id = entry.daily_id)}}"
+                    class="btn btn-delete"
+                    >Delete</a
+                  >
                 </div>
+              </div>
+              {% endfor %} {% else %}
+              <div class="empty-state">
+                <h4>No Entries Yet</h4>
+                <p>
+                  Start tracking your carbon footprint by creating your first
+                  daily entry!
+                </p>
+                <a
+                  href="{{url_for('daily_user_entry')}}"
+                  class="btn btn-create"
+                >
+                  Create Your First Entry
+                </a>
+              </div>
               {% endif %}
             </div>
           </div>
