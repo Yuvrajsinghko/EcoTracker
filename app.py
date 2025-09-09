@@ -340,7 +340,7 @@ def profile():
             "SELECT name,age,gender,username,phone_no,email,user_password,date_joined FROM SignupDetails WHERE username = %s",
             (username,),
         )
-        user = cursor.fetchone()  # returns dict because of DictCursor
+        user = cursor.fetchone()  
         cursor.close()
     return render_template("profile.html", user=user)
 
