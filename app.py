@@ -1,4 +1,5 @@
-from flask import Flask, flash, redirect, render_template, request, session, url_for
+from urllib import response
+from flask import Flask, flash, redirect, render_template, request, session, url_for, make_response
 import pymysql
 
 from datetime import date
@@ -54,7 +55,8 @@ def submit():
     if user and check_password_hash(user["user_password"], password):
 
         session["username"] = username  # Store username in session
-        return render_template("success.html", name=username)
+
+        return render_template("success.html")
     else:
 
         flash("Invalid username or password", "danger")
@@ -340,7 +342,7 @@ def profile():
             "SELECT name,age,gender,username,phone_no,email,user_password,date_joined FROM SignupDetails WHERE username = %s",
             (username,),
         )
-        user = cursor.fetchone()  
+        user = cursor.fetchone()
         cursor.close()
     return render_template("profile.html", user=user)
 
@@ -487,6 +489,7 @@ def edit_entry(entry_id):
         return redirect(url_for("view_single_entry", entry_id=entry_id))
     except Exception as e:
         db.rollback()
+        print(f"ERROR: {e}")
         flash("Failed to update entry", "error")
 
         return redirect(url_for("entries_overview"))
@@ -512,7 +515,7 @@ def user_leaderboard():
         print(top_users)
         cursor.execute("SELECT id FROM SignupDetails WHERE username = %s", (username,))
         user_result = cursor.fetchone()
-        
+
         if user_result:
             user_id = user_result["id"]
 
@@ -520,10 +523,15 @@ def user_leaderboard():
                 "SELECT SUM(emp.points_earned) as my_points,COUNT(de.daily_id) as my_entries,AVG (de.carbon_score) as my_avg_carbon FROM EmployeePoints emp JOIN DailyEntry de ON emp.user_id = de.signup_ref_id WHERE emp.user_id = %s",
                 (user_id,),
             )
-            current_user_stats=cursor.fetchone()
+            current_user_stats = cursor.fetchone()
         cursor.close()
 
-        return render_template("leaderboard.html",top_users=top_users,current_user_stats=current_user_stats,username=username)
+        return render_template(
+            "leaderboard.html",
+            top_users=top_users,
+            current_user_stats=current_user_stats,
+            username=username,
+        )
 
 
 @app.route("/update_profile", methods=["POST"])
@@ -537,16 +545,44 @@ def update_user_profile():
     gender = request.form.get("gender")
     phone_no = request.form.get("phone_no")
     email = request.form.get("email")
-    password = request.form.get("password")
+    errors = []
+    if not name or not (4 <= len(name) <= 16):
+        errors.append("Name must be 4-16 characters long.")
+
+    if not EMAIL_REGEX.fullmatch(email):
+        errors.append("Invalid email address")
+
+    if not PHONE_REGEX.fullmatch(phone_no):
+        errors.append("Invalid phone number")
+
+    try:
+        age_val = int(age)
+        if not (18 <= age_val <= 90):
+            errors.append("Age must be between 18 and 90.")
+    except (ValueError, TypeError):
+        errors.append("Invalid Age")
+
+    if gender not in ["Male", "Female", "Other"]:
+        errors.append("Please select a valid gender.")
+
+    if errors:
+        for error in errors:
+            flash(error, "error")
+        return redirect(url_for("profile"))
 
     try:
         cursor = db.cursor()
         cursor.execute("SELECT id FROM SignupDetails WHERE username = %s", (username,))
         a = cursor.fetchone()
+        if not a:
+            flash("User not found", "error")
+            return redirect(url_for("profile"))
+
         user_id = a["id"]
+
         cursor.execute(
-            "UPDATE SignupDetails SET name = %s,age = %s,gender = %s,phone_no = %s,email = %s,user_password = %s WHERE  id = %s",
-            (name, age, gender, phone_no, email, password, user_id),
+            "UPDATE SignupDetails SET name = %s, age = %s, gender = %s, phone_no = %s, email = %s WHERE id = %s",
+            (name, age, gender, phone_no, email, user_id),
         )
         db.commit()
         cursor.close()
@@ -554,9 +590,52 @@ def update_user_profile():
 
     except Exception as e:
         db.rollback()
+        print(f"Database error:{e}")
         flash("Error updating profile", "error")
 
     return redirect(url_for("profile"))
+
+
+@app.route("/change_password", methods=["POST"])
+def pass_change():
+    username = session["username"]
+    errors = []
+    if username:
+        cursor = db.cursor()
+
+        cursor.execute("SELECT id FROM SignupDetails WHERE username = %s", (username,))
+        a = cursor.fetchone()
+        user_id = a["id"]
+
+        new_password = request.form.get("new_password")
+        confirm_password = request.form.get("confirm_password")
+
+        password_regex = re.compile(
+            r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,32}$"
+        )
+        if not password_regex.fullmatch(new_password):
+            errors.append(
+                "Password must be 8–12 chars, include uppercase, lowercase, number & special character."
+            )
+        if new_password != confirm_password:
+            errors.append("Passwords do not match.")
+
+        if errors:
+            for error in errors:
+                flash(error, "danger")
+            return redirect(url_for("profile"))
+        else:
+            hashed_password = generate_password_hash(
+                new_password, method="pbkdf2:sha256", salt_length=16
+            )
+            cursor.execute(
+                "UPDATE SignupDetails SET user_password = %s WHERE id = %s",
+                (hashed_password, user_id),
+            )
+            db.commit()
+            cursor.close()
+            flash("Password updated successfully", "success")
+            return redirect(url_for("profile"))
 
 
 @app.route("/delete_profile", methods=["POST"])
@@ -585,7 +664,11 @@ def delete_user_profile():
 @app.route("/logout")
 def logout():
     session.clear()
-    return render_template("Login.html")
+    response= make_response(redirect(url_for('login')))
+    response.headers['Cache-Control'] = 'no-cache, no_store ,must_revalidate'
+    response.headers['Pragma']= 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 
 if __name__ == "__main__":
