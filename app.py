@@ -441,7 +441,7 @@ def delete_user_profile():
 
     except Exception as e:
         db.rollback()
-        flash("Error deleteing profile","error")
+        flash("Error deleting profile","error")
         return redirect(url_for('profile'))
     
     
