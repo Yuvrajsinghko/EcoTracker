@@ -337,7 +337,6 @@
               placeholder="Enter your age"
               min="18"
               max="90"
-              
               required
             />
             <div class="valid-feedback">Looks good!</div>
@@ -358,6 +357,7 @@
           </div>
 
           <!-- Username -->
+          <!-- Username -->
           <div class="mb-3">
             <label for="username" class="form-label">Username</label>
             <input
@@ -368,11 +368,14 @@
               placeholder="Enter your username"
               minlength="8"
               maxlength="10"
+              pattern="^[A-Za-z0-9]{8,10}$"
+              title="Username must be 8–10 characters long and contain only letters and numbers (no special characters)."
               required
             />
             <div class="valid-feedback">Looks good!</div>
             <div class="invalid-feedback">
-              Username must be 8–10 characters long.
+              Username must be 8–10 characters long and contain only letters and
+              numbers (no special characters).
             </div>
           </div>
 
@@ -465,7 +468,7 @@
       function validatePasswordMatch() {
         const pwd = password.value;
         const confirmPwd = confirmPassword.value;
-        
+
         // Only validate if both fields have content
         if (pwd && confirmPwd) {
           if (pwd === confirmPwd) {
@@ -496,7 +499,7 @@
       signupForm.addEventListener("submit", function (e) {
         // Always validate password match on submit
         validatePasswordMatch();
-        
+
         if (!signupForm.checkValidity()) {
           e.preventDefault();
           e.stopPropagation();
@@ -519,7 +522,7 @@
         input.addEventListener("input", function () {
           // Clear custom validity first
           this.setCustomValidity("");
-          
+
           if (this.id === "confirmPassword") {
             // Use debounced validation for confirm password
             debouncedPasswordValidation();
@@ -531,13 +534,15 @@
             // Validate the password field itself
             validateField(this);
           } else if (this.id === "email") {
-            const emailPattern = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,63}$/;
+            const emailPattern =
+              /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,63}$/;
             if (this.value && !emailPattern.test(this.value)) {
               this.setCustomValidity("Invalid email address");
             }
             validateField(this);
           } else if (this.id === "phone") {
-            const phonePattern = /^(?!(\d)\1{9}$)(?!1234567890$)(?!9876543210$)(?!9898989898$)(?!7878787878$)(?!5656565656$)(?!1212121212$)(?!2323232323$)(?!4545454545$)(?!6767676767$)(?!8989898989$)[6-9][0-9]{9}$/;
+            const phonePattern =
+              /^(?!(\d)\1{9}$)(?!1234567890$)(?!9876543210$)(?!9898989898$)(?!7878787878$)(?!5656565656$)(?!1212121212$)(?!2323232323$)(?!4545454545$)(?!6767676767$)(?!8989898989$)[6-9][0-9]{9}$/;
             if (this.value && !phonePattern.test(this.value)) {
               this.setCustomValidity("Invalid phone number");
             }
@@ -548,7 +553,7 @@
         });
 
         // Also validate on blur for better UX
-        input.addEventListener("blur", function() {
+        input.addEventListener("blur", function () {
           if (this.id === "confirmPassword") {
             validatePasswordMatch();
           }
@@ -567,16 +572,18 @@
       }
 
       // Reset button functionality
-      document.getElementById("resetBtn").addEventListener("click", function () {
-        signupForm.reset();
-        signupForm.classList.remove("was-validated");
-        
-        // Clear all validation classes and custom validity
-        document.querySelectorAll(".is-valid, .is-invalid").forEach((el) => {
-          el.classList.remove("is-valid", "is-invalid");
-          el.setCustomValidity("");
+      document
+        .getElementById("resetBtn")
+        .addEventListener("click", function () {
+          signupForm.reset();
+          signupForm.classList.remove("was-validated");
+
+          // Clear all validation classes and custom validity
+          document.querySelectorAll(".is-valid, .is-invalid").forEach((el) => {
+            el.classList.remove("is-valid", "is-invalid");
+            el.setCustomValidity("");
+          });
         });
-      });
     </script>
   </body>
 </html>

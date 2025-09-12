@@ -1,6 +1,7 @@
 from urllib import response
 from flask import Flask, flash, redirect, render_template, request, session, url_for, make_response
 import pymysql
+from functools import wraps
 
 from datetime import date
 import re
@@ -36,10 +37,25 @@ def login():
 def signup():
     return render_template("Signup.html")
 
+def login_required(view_func):
+    @wraps(view_func)
+    def wrapper(*args,**kwargs):
+        if "username" not in session:
+            return redirect(url_for('login'))
+        
+        response=make_response(view_func(*args,**kwargs))
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+
+        return response
+    return wrapper
+
 
 @app.route("/submit", methods=["POST"])
 def submit():
 
+    
     username = request.form.get("username")
     password = request.form.get("password")
     cursor = db.cursor()
@@ -239,6 +255,7 @@ def calculate_carbon_score(form_data):
 
 
 @app.route("/dailyentrypage", methods=["GET", "POST"])
+@login_required
 def daily_user_entry():
     if request.method == "GET":
         username = session.get("username", None)
@@ -323,6 +340,7 @@ def daily_user_entry():
 
 
 @app.route("/success")
+@login_required
 def registration_done():
     username = session.get("username", None)
     if not username:
@@ -332,6 +350,7 @@ def registration_done():
 
 
 @app.route("/profile")
+@login_required
 def profile():
     username = session.get("username", None)
     if not username:
@@ -348,6 +367,7 @@ def profile():
 
 
 @app.route("/entries_overview")
+@login_required
 def entries_overview():
     username = session.get("username", None)
     if not username:
@@ -372,6 +392,7 @@ def entries_overview():
 
 
 @app.route("/entry/<int:entry_id>")
+@login_required
 def view_single_entry(entry_id):
     cursor = db.cursor()
     cursor.execute(
@@ -385,6 +406,7 @@ def view_single_entry(entry_id):
 
 
 @app.route("/entry/delete/<int:entry_id>")
+
 def delete_entry(entry_id):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM DailyEntry WHERE daily_id = %s", (entry_id,))
@@ -418,6 +440,7 @@ def delete_entry(entry_id):
 
 
 @app.route("/entry/edit/<int:entry_id>", methods=["GET", "POST"])
+@login_required
 def edit_entry(entry_id):
     username = session.get("username", None)
     if not username:
@@ -496,6 +519,7 @@ def edit_entry(entry_id):
 
 
 @app.route("/leaderboard", methods=["GET", "POST"])
+@login_required
 def user_leaderboard():
     username = session.get("username", None)
     if not username:
@@ -512,7 +536,7 @@ def user_leaderboard():
         )
 
         top_users = cursor.fetchall()
-        print(top_users)
+        
         cursor.execute("SELECT id FROM SignupDetails WHERE username = %s", (username,))
         user_result = cursor.fetchone()
 
@@ -535,6 +559,7 @@ def user_leaderboard():
 
 
 @app.route("/update_profile", methods=["POST"])
+@login_required
 def update_user_profile():
     username = session.get("username", None)
     if not username:
@@ -639,6 +664,7 @@ def pass_change():
 
 
 @app.route("/delete_profile", methods=["POST"])
+@login_required
 def delete_user_profile():
     username = session.get("username", None)
     if not username:
