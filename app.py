@@ -88,8 +88,10 @@ def register():
     age = request.form.get("age")
     gender = request.form.get("gender")
     password = request.form.get("password")
+    
     u_sername = request.form.get("username")
     confirm_password = request.form.get("confirmPassword")
+    # print(user,password)
     hashed_password = generate_password_hash(
         password, method="pbkdf2:sha256", salt_length=16
     )
