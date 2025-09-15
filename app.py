@@ -533,7 +533,7 @@ def user_leaderboard():
             """
             SELECT s.name,s.username,SUM(emp.points_earned) as total_points,COUNT(de.daily_id) as total_entries,
             AVG(de.carbon_score) as avg_carbon_score 
-            FROM SignupDetails s JOIN EmployeePoints emp ON s.id=emp.user_id JOIN DailyEntry de ON s.id = de.signup_ref_id GROUP BY s.id,s.name,s.username ORDER BY total_points DESC LIMIT 10
+            FROM SignupDetails s JOIN EmployeePoints emp ON s.id=emp.user_id JOIN DailyEntry de ON s.id = de.signup_ref_id GROUP BY s.id ORDER BY total_points DESC LIMIT 10
         """
         )
 

@@ -36,6 +36,53 @@
         z-index: -1;
       }
 
+      /* Custom Navigation - Always Condensed */
+      .custom-nav {
+        margin-left: auto;
+      }
+      .custom-nav .nav-link {
+        font-weight: 500;
+        transition: all 0.3s ease-in-out;
+        padding: 8px 12px;
+        border-radius: 6px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        color: white;
+      }
+
+      /* Custom Dropdown Button */
+      .custom-dropdown {
+        position: relative;
+      }
+      .dropdown-btn {
+        background: transparent;
+        border: none;
+        font-weight: 500;
+        transition: all 0.3s ease-in-out;
+        padding: 8px 12px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        cursor: pointer;
+      }
+
+      /* Quick Action Button - Prominent Daily Entry */
+      .quick-action {
+        color: #f0d806 !important;
+        text-shadow: 0 0 2px #f0d806;
+        font-weight: 600 !important;
+        background: rgba(240, 216, 6, 0.1);
+        border-radius: 6px;
+        margin-right: 10px;
+      }
+      .quick-action:hover {
+        color: #000 !important;
+        background: rgba(240, 216, 6, 0.2);
+        text-shadow: 0 0 4px #f0d806, 0 0 8px #f0d806;
+        transform: scale(1.03);
+      }
+
       /* Navbar Dropdown Styling */
       .neon-dropdown {
         color: #66f0d4 !important;
@@ -443,16 +490,6 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('registration_done') }}"
-                ><i class="fas fa-home me-1"></i>Home</a
-              >
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('daily_user_entry') }}">
-                <i class="fas fa-plus-circle me-1"></i>Daily Entry
-              </a>
-            </li>
-            <li class="nav-item">
               <a class="nav-link" href="{{ url_for('entries_overview') }}">
                 <i class="fas fa-list me-1"></i>Show Entries
               </a>
@@ -539,15 +576,17 @@
         `;
         document.head.appendChild(style);
       });
-
+      
       document.querySelectorAll('a[href]').forEach(link => {
         link.addEventListener('click', function(e) {
-          if (this.getAttribute('href').startsWith('{{')) {
+          if (this.getAttribute('href').startsWith('/')) {
             this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>' + this.textContent.trim();
             this.style.pointerEvents = 'none';
           }
         });
       });
+
+      
     </script>
   </body>
 </html>
