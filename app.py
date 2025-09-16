@@ -1,18 +1,37 @@
 from urllib import response
-from flask import Flask, flash, redirect, render_template, request, session, url_for, make_response
+from flask import (
+    Flask,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+    make_response,
+)
 import pymysql
 from functools import wraps
-
-from datetime import date
+from datetime import date, datetime
+import time
+import uuid
 import re
 from werkzeug.security import generate_password_hash, check_password_hash
 
 EMAIL_REGEX = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,63}$")
 PHONE_REGEX = re.compile(
-    r"^(?!(\d)\1{9}$)(?!1234567890$)(?!9876543210$)"
-    r"(?!9898989898$)(?!7878787878$)(?!5656565656$)"
-    r"(?!1212121212$)(?!2323232323$)(?!4545454545$)"
-    r"(?!6767676767$)(?!8989898989$)[6-9][0-9]{9}$"
+    r"^(?!(\d)\1{9}$)"
+    r"(?!1234567890$)"
+    r"(?!9876543210$)"
+    r"(?!9898989898$)"
+    r"(?!7878787878$)"
+    r"(?!5656565656$)"
+    r"(?!1212121212$)"
+    r"(?!2323232323$)"
+    r"(?!4545454545$)"
+    r"(?!6767676767$)"
+    r"(?!8989898989$)"
+    r"(?![6-9]0{9}$)"
+    r"[6-9][0-9]{9}$"
 )
 
 app = Flask(__name__)
@@ -27,6 +46,60 @@ db = pymysql.connections.Connection(
 
 app.secret_key = "secretkey"
 
+INACTIVITY_LIMIT = 60
+
+
+@app.before_request
+def enforce_session_rules():
+    cursor = db.cursor()
+    if request.endpoint in ("login", "signup", "submit", "register", "static"):
+        return None
+
+    username = session.get("username")
+    token = session.get("session_token")
+    user_id = session.get("user_id")
+
+    if not username or not token or not user_id:
+        return redirect(url_for("login"))
+
+    cursor.execute(
+        "SELECT active_session, last_active FROM SignupDetails WHERE id = %s",(
+            user_id,
+        )
+    )
+
+    user = cursor.fetchone()
+
+    if not user:
+        session.clear()
+        return redirect(url_for("login"))
+    # Enforce single-session
+    if user["active_session"] != token:
+        session.clear()
+        flash("You were logged out because you logged in from another device.")
+        return redirect(url_for("login"))
+
+    # Enforce inactivity
+    if user["last_active"]:
+        elapsed_time = (datetime.now() - user["last_active"]).total_seconds()
+        if elapsed_time > INACTIVITY_LIMIT:
+            cursor.execute(
+                "UPDATE SignupDetails SET active_session = NULL,last_active = NULL WHERE id = %s",
+                (user_id,),
+            )
+            db.commit()
+            session.clear()
+            flash("You were logged out due to inactivity")
+            return redirect(url_for("login"))
+    # Update last active
+    cursor.execute(
+        "UPDATE SignupDetails SET last_active =NOW() WHERE id = %s",(
+            user_id,
+        )
+    )
+    db.commit()
+    cursor.close()
+
 
 @app.route("/")
 def login():
@@ -37,41 +110,34 @@ def login():
 def signup():
     return render_template("Signup.html")
 
-def login_required(view_func):
-    @wraps(view_func)
-    def wrapper(*args,**kwargs):
-        if "username" not in session:
-            return redirect(url_for('login'))
-        
-        response=make_response(view_func(*args,**kwargs))
-        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-        response.headers["Pragma"] = "no-cache"
-        response.headers["Expires"] = "0"
-
-        return response
-    return wrapper
-
 
 @app.route("/submit", methods=["POST"])
 def submit():
 
-    
     username = request.form.get("username")
     password = request.form.get("password")
     cursor = db.cursor()
 
     cursor.execute(
-        "SELECT username,user_password FROM SignupDetails WHERE username = %s",
+        "SELECT id,user_password FROM SignupDetails WHERE username = %s",
         (username,),
     )
     user = cursor.fetchone()
 
-    cursor.close()
-
     if user and check_password_hash(user["user_password"], password):
 
-        session["username"] = username  # Store username in session
-
+        session_token = str(uuid.uuid4())
+        cursor.execute(
+            "UPDATE SignupDetails SET active_session = %s,last_active = NOW() WHERE id = %s",
+            (session_token, user["id"]),
+        )
+        db.commit()
+        cursor.close()
+        session.clear()
+        session["username"] = username
+        session["session_token"] = session_token
+        session["user_id"] = user["id"]
+        print(session)
         return render_template("success.html")
     else:
 
@@ -88,10 +154,10 @@ def register():
     age = request.form.get("age")
     gender = request.form.get("gender")
     password = request.form.get("password")
-    
+
     u_sername = request.form.get("username")
     confirm_password = request.form.get("confirmPassword")
-    # print(user,password)
+
     hashed_password = generate_password_hash(
         password, method="pbkdf2:sha256", salt_length=16
     )
@@ -257,7 +323,6 @@ def calculate_carbon_score(form_data):
 
 
 @app.route("/dailyentrypage", methods=["GET", "POST"])
-@login_required
 def daily_user_entry():
     if request.method == "GET":
         username = session.get("username", None)
@@ -342,7 +407,6 @@ def daily_user_entry():
 
 
 @app.route("/success")
-@login_required
 def registration_done():
     username = session.get("username", None)
     if not username:
@@ -352,7 +416,6 @@ def registration_done():
 
 
 @app.route("/profile")
-@login_required
 def profile():
     username = session.get("username", None)
     if not username:
@@ -369,7 +432,6 @@ def profile():
 
 
 @app.route("/entries_overview")
-@login_required
 def entries_overview():
     username = session.get("username", None)
     if not username:
@@ -394,7 +456,6 @@ def entries_overview():
 
 
 @app.route("/entry/<int:entry_id>")
-@login_required
 def view_single_entry(entry_id):
     cursor = db.cursor()
     cursor.execute(
@@ -408,7 +469,6 @@ def view_single_entry(entry_id):
 
 
 @app.route("/entry/delete/<int:entry_id>")
-
 def delete_entry(entry_id):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM DailyEntry WHERE daily_id = %s", (entry_id,))
@@ -442,7 +502,6 @@ def delete_entry(entry_id):
 
 
 @app.route("/entry/edit/<int:entry_id>", methods=["GET", "POST"])
-@login_required
 def edit_entry(entry_id):
     username = session.get("username", None)
     if not username:
@@ -521,7 +580,6 @@ def edit_entry(entry_id):
 
 
 @app.route("/leaderboard", methods=["GET", "POST"])
-@login_required
 def user_leaderboard():
     username = session.get("username", None)
     if not username:
@@ -538,7 +596,7 @@ def user_leaderboard():
         )
 
         top_users = cursor.fetchall()
-        
+
         cursor.execute("SELECT id FROM SignupDetails WHERE username = %s", (username,))
         user_result = cursor.fetchone()
 
@@ -561,7 +619,6 @@ def user_leaderboard():
 
 
 @app.route("/update_profile", methods=["POST"])
-@login_required
 def update_user_profile():
     username = session.get("username", None)
     if not username:
@@ -666,7 +723,6 @@ def pass_change():
 
 
 @app.route("/delete_profile", methods=["POST"])
-@login_required
 def delete_user_profile():
     username = session.get("username", None)
     if not username:
@@ -691,13 +747,40 @@ def delete_user_profile():
 
 @app.route("/logout")
 def logout():
+    user_id = session.get("user_id")
+    if user_id:
+        cursor = db.cursor()
+        cursor.execute(
+            "UPDATE SignupDetails SET  active_session = NULL,last_active = NULL WHERE id = %s",(
+                user_id,
+            )
+        )
+        db.commit()
+        cursor.close()
+
     session.clear()
-    response= make_response(redirect(url_for('login')))
-    response.headers['Cache-Control'] = 'no-cache, no_store ,must_revalidate'
-    response.headers['Pragma']= 'no-cache'
-    response.headers['Expires'] = '0'
+    response = make_response(redirect(url_for("login")))
+    response.headers["Cache-Control"] = "no-cache, no_store ,must_revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
     return response
 
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+
+# def login_required(view_func):
+#     @wraps(view_func)
+#     def wrapper(*args, **kwargs):
+#         if "username" not in session:
+#             return redirect(url_for("login"))
+
+#         response = make_response(view_func(*args, **kwargs))
+#         response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+#         response.headers["Pragma"] = "no-cache"
+#         response.headers["Expires"] = "0"
+
+#         return response
+
+#     return wrapper
