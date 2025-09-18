@@ -35,6 +35,14 @@ PHONE_REGEX = re.compile(
 )
 
 app = Flask(__name__)
+
+app.config.update(
+    SESSION_COOKIE_SECURE=False,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='Lax'
+)
+
+
 db = pymysql.connections.Connection(
     host="localhost",
     user="yuvraj",
@@ -46,12 +54,12 @@ db = pymysql.connections.Connection(
 
 app.secret_key = "secretkey"
 
-INACTIVITY_LIMIT = 60
+INACTIVITY_LIMIT = 300
 
 
 @app.before_request
 def enforce_session_rules():
-    cursor = db.cursor()
+    
     if request.endpoint in ("login", "signup", "submit", "register", "static"):
         return None
 
@@ -61,44 +69,54 @@ def enforce_session_rules():
 
     if not username or not token or not user_id:
         return redirect(url_for("login"))
+    cursor = db.cursor()
+    try:
 
-    cursor.execute(
-        "SELECT active_session, last_active FROM SignupDetails WHERE id = %s",(
-            user_id,
-        )
-    )
-
-    user = cursor.fetchone()
-
-    if not user:
-        session.clear()
-        return redirect(url_for("login"))
-    # Enforce single-session
-    if user["active_session"] != token:
-        session.clear()
-        flash("You were logged out because you logged in from another device.")
-        return redirect(url_for("login"))
-
-    # Enforce inactivity
-    if user["last_active"]:
-        elapsed_time = (datetime.now() - user["last_active"]).total_seconds()
-        if elapsed_time > INACTIVITY_LIMIT:
-            cursor.execute(
-                "UPDATE SignupDetails SET active_session = NULL,last_active = NULL WHERE id = %s",
-                (user_id,),
+        cursor.execute(
+            "SELECT active_session, last_active FROM SignupDetails WHERE id = %s",(
+                user_id,
             )
-            db.commit()
-            session.clear()
-            flash("You were logged out due to inactivity")
-            return redirect(url_for("login"))
-    # Update last active
-    cursor.execute(
-        "UPDATE SignupDetails SET last_active =NOW() WHERE id = %s",(
-            user_id,
         )
-    )
-    db.commit()
-    cursor.close()
+
+        user = cursor.fetchone()
+
+        if not user:
+            session.clear()
+            return redirect(url_for("login"))
+        # Enforce single-session
+        if not user["active_session"] or user["active_session"] != token:
+            session.clear()
+            flash("You were logged out because you logged in from another device.")
+            return redirect(url_for("login"))
+
+        # Enforce inactivity
+        if user["last_active"]:
+            current_time = datetime.now()
+            last_active = user["last_active"]
+            elapsed_time = (current_time - last_active).total_seconds()
+            if elapsed_time > INACTIVITY_LIMIT:
+                cursor.execute(
+                    "UPDATE SignupDetails SET active_session = NULL,last_active = NULL WHERE id = %s",
+                    (user_id,),
+                )
+                db.commit()
+                session.clear()
+                flash("You were logged out due to inactivity")
+                return redirect(url_for("login"))
+        # Update last active
+        cursor.execute(
+            "UPDATE SignupDetails SET last_active = %s WHERE id = %s",(datetime.now(),
+                user_id,
+            )
+        )
+        db.commit()
+    
+    except Exception as e:
+        print(f"Session validation error: {e}")
+        session.clear()
+        return redirect(url_for("login"))
+    finally:
+        cursor.close()
 
 
 @app.route("/")
@@ -116,35 +134,45 @@ def submit():
 
     username = request.form.get("username")
     password = request.form.get("password")
-    cursor = db.cursor()
 
-    cursor.execute(
-        "SELECT id,user_password FROM SignupDetails WHERE username = %s",
-        (username,),
-    )
-    user = cursor.fetchone()
-
-    if user and check_password_hash(user["user_password"], password):
-
-        session_token = str(uuid.uuid4())
-        cursor.execute(
-            "UPDATE SignupDetails SET active_session = %s,last_active = NOW() WHERE id = %s",
-            (session_token, user["id"]),
-        )
-        db.commit()
-        cursor.close()
-        session.clear()
-        session["username"] = username
-        session["session_token"] = session_token
-        session["user_id"] = user["id"]
-        print(session)
-        return render_template("success.html")
-    else:
-
-        flash("Invalid username or password", "danger")
+    if not username or not password:
+        flash("Please provide both username and password", "danger")
         return render_template("Login.html")
+    cursor = db.cursor()
+    try:
+        cursor.execute(
+            "SELECT id,user_password,active_session FROM SignupDetails WHERE username = %s",
+            (username,),
+        )
+        user = cursor.fetchone()
 
+        if user and check_password_hash(user["user_password"], password):
+            # Always generate new token only ON login (not refresh)
+            session_token = str(uuid.uuid4())
+            cursor.execute(
+                "UPDATE SignupDetails SET active_session = %s, last_active = %s WHERE id = %s",
+                (session_token, datetime.now(), user["id"]),
+            )
+            db.commit()
 
+            
+            session.clear()
+            session["username"] = username
+            session["session_token"] = session_token
+            session["user_id"] = user["id"]
+            return render_template("success.html")
+
+        else:
+
+            flash("Invalid username or password", "danger")
+            return render_template("Login.html")
+
+    except Exception as e:
+        print(f"Login error: {e}")
+        flash("An error occurred during login", "danger")
+        return render_template("Login.html")
+    finally:
+        cursor.close()
 @app.route("/register", methods=["POST"])
 def register():
     cursor = db.cursor()
@@ -750,13 +778,18 @@ def logout():
     user_id = session.get("user_id")
     if user_id:
         cursor = db.cursor()
-        cursor.execute(
-            "UPDATE SignupDetails SET  active_session = NULL,last_active = NULL WHERE id = %s",(
-                user_id,
+        try:
+            cursor.execute(
+                "UPDATE SignupDetails SET  active_session = NULL,last_active = NULL WHERE id = %s",(
+                    user_id,
+                )
             )
-        )
-        db.commit()
-        cursor.close()
+            db.commit()
+        except Exception as e:
+            print(f"Logout error: {e}")
+        finally:
+            cursor.close()   
+        
 
     session.clear()
     response = make_response(redirect(url_for("login")))
