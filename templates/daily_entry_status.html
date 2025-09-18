@@ -81,5 +81,25 @@
         >New Entry</a
       >
     </div>
+    <script>
+      // Auto-logout after inactivity (client-side only)
+      let inactivityLimit = 5 * 60 * 1000; // 5 minutes
+      let inactivityTimer;
+
+      function resetTimer() {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(() => {
+          window.location.href = "{{ url_for('logout') }}"; // Force logout
+        }, inactivityLimit);
+      }
+
+      // Reset timer when user interacts
+      ["mousemove", "keydown", "click", "scroll"].forEach((event) => {
+        window.addEventListener(event, resetTimer);
+      });
+
+      // Start timer
+      resetTimer();
+    </script>
   </body>
 </html>

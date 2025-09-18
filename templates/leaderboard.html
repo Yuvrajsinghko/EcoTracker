@@ -243,8 +243,13 @@
       }
 
       @keyframes bounce {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-8px); }
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-8px);
+        }
       }
 
       /* Stats card styling */
@@ -305,7 +310,7 @@
                 >Daily Entry</a
               >
             </li>
-           
+
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('profile') }}">Profile</a>
             </li>
@@ -332,15 +337,24 @@
               <h5 class="stats-header mb-3">📊 Your Stats</h5>
               <div class="row text-center">
                 <div class="col-md-4">
-                  <div class="metric-value">{{ current_user_stats.my_points|int if current_user_stats.my_points else 0 }}</div>
+                  <div class="metric-value">
+                    {{ current_user_stats.my_points|int if
+                    current_user_stats.my_points else 0 }}
+                  </div>
                   <small class="text-light">Total Points</small>
                 </div>
                 <div class="col-md-4">
-                  <div class="metric-value">{{ current_user_stats.my_entries if current_user_stats.my_entries else 0 }}</div>
+                  <div class="metric-value">
+                    {{ current_user_stats.my_entries if
+                    current_user_stats.my_entries else 0 }}
+                  </div>
                   <small class="text-light">Entries Made</small>
                 </div>
                 <div class="col-md-4">
-                  <div class="metric-value">{{ "%.1f"|format(current_user_stats.my_avg_carbon|float) if current_user_stats.my_avg_carbon else "0.0" }}</div>
+                  <div class="metric-value">
+                    {{ "%.1f"|format(current_user_stats.my_avg_carbon|float) if
+                    current_user_stats.my_avg_carbon else "0.0" }}
+                  </div>
                   <small class="text-light">Avg Carbon Score</small>
                 </div>
               </div>
@@ -354,17 +368,18 @@
               {% for user in top_users[:3] %}
               <div class="podium-place">
                 <div class="crown-icon">
-                  {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% else %}🥉{% endif %}
+                  {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% else
+                  %}🥉{% endif %}
                 </div>
-                <div class="podium-avatar">
-                  {{ user.name[0].upper() }}
-                </div>
+                <div class="podium-avatar">{{ user.name[0].upper() }}</div>
                 <h6 class="text-white fw-bold">{{ user.name }}</h6>
                 <small class="text-light">@{{ user.username }}</small>
-                <div class="podium-base {% if loop.index == 1 %}gold-base{% elif loop.index == 2 %}silver-base{% else %}bronze-base{% endif %}">
+                <div
+                  class="podium-base {% if loop.index == 1 %}gold-base{% elif loop.index == 2 %}silver-base{% else %}bronze-base{% endif %}"
+                >
                   <div class="fs-5">{{ user.total_points|int }}</div>
                   <small>Points</small>
-                  <br>
+                  <br />
                   <small>{{ user.total_entries }} entries</small>
                 </div>
               </div>
@@ -386,13 +401,18 @@
                 </thead>
                 <tbody>
                   {% for user in top_users %}
-                  <tr class="table-row {% if username == user.username %}current-user-row{% endif %}">
+                  <tr
+                    class="table-row {% if username == user.username %}current-user-row{% endif %}"
+                  >
                     <td>
                       <span class="rank-badge">{{ loop.index }}</span>
                     </td>
                     <td>
                       <div class="d-flex align-items-center">
-                        <div class="podium-avatar me-3" style="width: 35px; height: 35px; font-size: 1rem;">
+                        <div
+                          class="podium-avatar me-3"
+                          style="width: 35px; height: 35px; font-size: 1rem"
+                        >
                           {{ user.name[0].upper() }}
                         </div>
                         <div>
@@ -401,9 +421,15 @@
                         </div>
                       </div>
                     </td>
-                    <td class="text-center fw-bold text-warning">{{ user.total_points|int }}</td>
-                    <td class="text-center text-info">{{ user.total_entries }}</td>
-                    <td class="text-center text-success">{{ "%.1f"|format(user.avg_carbon_score|float) }}</td>
+                    <td class="text-center fw-bold text-warning">
+                      {{ user.total_points|int }}
+                    </td>
+                    <td class="text-center text-info">
+                      {{ user.total_entries }}
+                    </td>
+                    <td class="text-center text-success">
+                      {{ "%.1f"|format(user.avg_carbon_score|float) }}
+                    </td>
                   </tr>
                   {% endfor %}
                 </tbody>
@@ -413,7 +439,10 @@
             <div class="text-center text-light py-5">
               <h4>No data available yet!</h4>
               <p>Start making daily entries to see the leaderboard</p>
-              <a href="{{ url_for('daily_user_entry') }}" class="btn btn-neon mt-3">
+              <a
+                href="{{ url_for('daily_user_entry') }}"
+                class="btn btn-neon mt-3"
+              >
                 Make Your First Entry
               </a>
             </div>
@@ -421,10 +450,12 @@
 
             <!-- Action Buttons -->
             <div class="text-center mt-4">
-              <a href="{{ url_for('daily_user_entry') }}" class="btn btn-neon me-3">
+              <a
+                href="{{ url_for('daily_user_entry') }}"
+                class="btn btn-neon me-3"
+              >
                 📝 Add Daily Entry
               </a>
-              
             </div>
           </div>
         </div>
@@ -432,5 +463,25 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Auto-logout after inactivity (client-side only)
+      let inactivityLimit = 5 * 60 * 1000; // 5 minutes
+      let inactivityTimer;
+
+      function resetTimer() {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(() => {
+          window.location.href = "{{ url_for('logout') }}"; // Force logout
+        }, inactivityLimit);
+      }
+
+      // Reset timer when user interacts
+      ["mousemove", "keydown", "click", "scroll"].forEach((event) => {
+        window.addEventListener(event, resetTimer);
+      });
+
+      // Start timer
+      resetTimer();
+    </script>
   </body>
 </html>

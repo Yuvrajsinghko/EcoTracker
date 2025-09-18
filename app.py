@@ -68,7 +68,10 @@ def enforce_session_rules():
     user_id = session.get("user_id")
 
     if not username or not token or not user_id:
+        session.clear()
         return redirect(url_for("login"))
+    
+
     cursor = db.cursor()
     try:
 
@@ -128,6 +131,10 @@ def login():
 def signup():
     return render_template("Signup.html")
 
+@app.route("/success")
+def valid_login():
+    return render_template("success.html")
+
 
 @app.route("/submit", methods=["POST"])
 def submit():
@@ -155,12 +162,11 @@ def submit():
             )
             db.commit()
 
-            
             session.clear()
             session["username"] = username
             session["session_token"] = session_token
             session["user_id"] = user["id"]
-            return render_template("success.html")
+            return redirect(url_for('valid_login'))
 
         else:
 

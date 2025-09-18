@@ -236,7 +236,8 @@
       }
 
       @keyframes scorePulse {
-        0%, 100% {
+        0%,
+        100% {
           text-shadow: 0 0 6px #66f0d4, 0 0 12px #66f0d4;
           transform: scale(1);
         }
@@ -312,7 +313,14 @@
       <div class="row justify-content-center">
         <div class="col-lg-8">
           <div class="entry-card p-4">
-            <h2 class="text-center mb-4" style="color: #00e0b8; text-shadow: 0 0 6px #00e0b8, 0 0 12px #00e0b8, 0 0 24px #00e0b8; animation: heroPulse 3s infinite ease-in-out;">
+            <h2
+              class="text-center mb-4"
+              style="
+                color: #00e0b8;
+                text-shadow: 0 0 6px #00e0b8, 0 0 12px #00e0b8, 0 0 24px #00e0b8;
+                animation: heroPulse 3s infinite ease-in-out;
+              "
+            >
               Daily Carbon Entry Details
             </h2>
 
@@ -334,7 +342,9 @@
               <div class="col-md-12 mb-3">
                 <div class="data-card transport-data">
                   <div class="data-label">Distance Travelled</div>
-                  <div class="data-value">{{ entry.distance_travelled }} km</div>
+                  <div class="data-value">
+                    {{ entry.distance_travelled }} km
+                  </div>
                 </div>
               </div>
             </div>
@@ -376,8 +386,7 @@
             <!-- Carbon Score & Summary -->
             <div class="summary-header section-header">
               <div class="neon-sign">
-                <div class="sign-content">
-                </div>
+                <div class="sign-content"></div>
               </div>
             </div>
             <div class="row">
@@ -385,7 +394,9 @@
                 <div class="data-card summary-data">
                   <div class="data-label text-center">Your Carbon Score</div>
                   <div class="carbon-score">{{ entry.carbon_score }}</div>
-                  <div class="entry-date">Entry Date: {{ entry.date_of_entry }}</div>
+                  <div class="entry-date">
+                    Entry Date: {{ entry.date_of_entry }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -394,7 +405,10 @@
             <div class="row mt-4">
               <div class="col-md-6 mb-2">
                 <div class="d-grid">
-                  <a href="{{ url_for('entries_overview') }}" class="btn-secondary-neon">
+                  <a
+                    href="{{ url_for('entries_overview') }}"
+                    class="btn-secondary-neon"
+                  >
                     View All Entries
                   </a>
                 </div>
@@ -413,5 +427,25 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Auto-logout after inactivity (client-side only)
+      let inactivityLimit = 5 * 60 * 1000; // 5 minutes
+      let inactivityTimer;
+
+      function resetTimer() {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(() => {
+          window.location.href = "{{ url_for('logout') }}"; // Force logout
+        }, inactivityLimit);
+      }
+
+      // Reset timer when user interacts
+      ["mousemove", "keydown", "click", "scroll"].forEach((event) => {
+        window.addEventListener(event, resetTimer);
+      });
+
+      // Start timer
+      resetTimer();
+    </script>
   </body>
 </html>
