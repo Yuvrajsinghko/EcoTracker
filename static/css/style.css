@@ -138,3 +138,94 @@ body {
   background-color: rgba(23, 162, 184, 0.8);
   border: 1px solid rgba(23, 162, 184, 0.6);
 }
+/* Add these styles to the end of your existing style.css file */
+
+/* Flash Messages - Update your existing flash message styles */
+.flash-message {
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  text-align: center;
+  color: white;
+  font-size: 14px;
+}
+
+.flash-success {
+  background-color: rgba(40, 167, 69, 0.8);
+  border: 1px solid rgba(40, 167, 69, 0.6);
+}
+
+.flash-danger, .flash-error {
+  background-color: rgba(220, 53, 69, 0.8);
+  border: 1px solid rgba(220, 53, 69, 0.6);
+}
+
+.flash-info {
+  background-color: rgba(23, 162, 184, 0.8);
+  border: 1px solid rgba(23, 162, 184, 0.6);
+}
+
+/* Input validation states */
+.input-box input.is-valid {
+  border: 2px solid rgba(40, 167, 69, 0.6);
+}
+
+.input-box input.is-invalid {
+  border: 2px solid rgba(220, 53, 69, 0.6);
+}
+
+/* Resend OTP button styling */
+.resend-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 14.5px;
+  padding: 0;
+  margin: 0;
+}
+
+.resend-btn:hover {
+  text-decoration: none;
+  opacity: 0.8;
+}
+
+/* Small text styling for descriptions */
+.small-text {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  margin: 10px 0;
+  line-height: 1.4;
+}
+
+/* OTP input specific styling */
+.otp-input {
+  text-align: center;
+  font-size: 1.2rem;
+  letter-spacing: 0.3rem;
+  font-weight: 600;
+}
+
+/* Password strength indicator */
+.password-hint {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  margin-bottom: 20px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+}
+
+/* Form validation feedback */
+.form-feedback {
+  font-size: 12px;
+  margin-top: 5px;
+  color: rgba(220, 53, 69, 0.8);
+}
+
+.form-feedback.valid {
+  color: rgba(40, 167, 69, 0.8);
+}

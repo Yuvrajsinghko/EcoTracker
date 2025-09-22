@@ -34,6 +34,8 @@ PHONE_REGEX = re.compile(
     r"[6-9][0-9]{9}$"
 )
 
+
+
 app = Flask(__name__)
 
 app.config.update(
@@ -94,6 +96,7 @@ def enforce_session_rules():
 
         # Enforce inactivity
         if user["last_active"]:
+            
             current_time = datetime.now()
             last_active = user["last_active"]
             elapsed_time = (current_time - last_active).total_seconds()
