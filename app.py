@@ -134,9 +134,17 @@ def login():
 def signup():
     return render_template("Signup.html")
 
+# @app.route("/success")
+# def valid_login():
+#     return render_template("success.html")
+
 @app.route("/success")
-def valid_login():
-    return render_template("success.html")
+def registration_done():
+    username = session.get("username", None)
+    if not username:
+        return render_template("Login.html")
+    else:
+        return render_template("success.html", name=username)
 
 
 @app.route("/submit", methods=["POST"])
@@ -169,7 +177,7 @@ def submit():
             session["username"] = username
             session["session_token"] = session_token
             session["user_id"] = user["id"]
-            return redirect(url_for('valid_login'))
+            return redirect(url_for('registration_done'))
 
         else:
 
@@ -443,13 +451,7 @@ def daily_user_entry():
         )
 
 
-@app.route("/success")
-def registration_done():
-    username = session.get("username", None)
-    if not username:
-        return render_template("Login.html")
-    else:
-        return render_template("success.html", name=username)
+
 
 
 @app.route("/profile")
