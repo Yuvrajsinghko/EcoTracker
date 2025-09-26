@@ -35,13 +35,12 @@ PHONE_REGEX = re.compile(
 )
 
 
-
 app = Flask(__name__)
 
 app.config.update(
     SESSION_COOKIE_SECURE=False,
     SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SAMESITE='Lax'
+    SESSION_COOKIE_SAMESITE="Lax",
 )
 
 
@@ -61,7 +60,7 @@ INACTIVITY_LIMIT = 300
 
 @app.before_request
 def enforce_session_rules():
-    
+
     if request.endpoint in ("login", "signup", "submit", "register", "static"):
         return None
 
@@ -72,15 +71,13 @@ def enforce_session_rules():
     if not username or not token or not user_id:
         session.clear()
         return redirect(url_for("login"))
-    
 
     cursor = db.cursor()
     try:
 
         cursor.execute(
-            "SELECT active_session, last_active FROM SignupDetails WHERE id = %s",(
-                user_id,
-            )
+            "SELECT active_session, last_active FROM SignupDetails WHERE id = %s",
+            (user_id,),
         )
 
         user = cursor.fetchone()
@@ -96,7 +93,7 @@ def enforce_session_rules():
 
         # Enforce inactivity
         if user["last_active"]:
-            
+
             current_time = datetime.now()
             last_active = user["last_active"]
             elapsed_time = (current_time - last_active).total_seconds()
@@ -111,12 +108,14 @@ def enforce_session_rules():
                 return redirect(url_for("login"))
         # Update last active
         cursor.execute(
-            "UPDATE SignupDetails SET last_active = %s WHERE id = %s",(datetime.now(),
+            "UPDATE SignupDetails SET last_active = %s WHERE id = %s",
+            (
+                datetime.now(),
                 user_id,
-            )
+            ),
         )
         db.commit()
-    
+
     except Exception as e:
         print(f"Session validation error: {e}")
         session.clear()
@@ -134,9 +133,11 @@ def login():
 def signup():
     return render_template("Signup.html")
 
+
 # @app.route("/success")
 # def valid_login():
 #     return render_template("success.html")
+
 
 @app.route("/success")
 def registration_done():
@@ -177,7 +178,7 @@ def submit():
             session["username"] = username
             session["session_token"] = session_token
             session["user_id"] = user["id"]
-            return redirect(url_for('registration_done'))
+            return redirect(url_for("registration_done"))
 
         else:
 
@@ -190,6 +191,8 @@ def submit():
         return render_template("Login.html")
     finally:
         cursor.close()
+
+
 @app.route("/register", methods=["POST"])
 def register():
     cursor = db.cursor()
@@ -199,15 +202,22 @@ def register():
     age = request.form.get("age")
     gender = request.form.get("gender")
     password = request.form.get("password")
-
     u_sername = request.form.get("username")
     confirm_password = request.form.get("confirmPassword")
 
+    
+
+    errors = []
+
+    if not all([name, email, user_phone_no, age, gender, password, u_sername, confirm_password]):
+        errors.append("All fields are required.")
+        for error in errors:
+            flash(error, "danger")
+        return render_template("Signup.html")
+    
     hashed_password = generate_password_hash(
         password, method="pbkdf2:sha256", salt_length=16
     )
-
-    errors = []
 
     cursor.execute(
         "SELECT username FROM SignupDetails WHERE username = %s", (u_sername,)
@@ -449,9 +459,6 @@ def daily_user_entry():
         return render_template(
             "daily_entry_status.html", name=username, message=message
         )
-
-
-
 
 
 @app.route("/profile")
@@ -791,16 +798,14 @@ def logout():
         cursor = db.cursor()
         try:
             cursor.execute(
-                "UPDATE SignupDetails SET  active_session = NULL,last_active = NULL WHERE id = %s",(
-                    user_id,
-                )
+                "UPDATE SignupDetails SET  active_session = NULL,last_active = NULL WHERE id = %s",
+                (user_id,),
             )
             db.commit()
         except Exception as e:
             print(f"Logout error: {e}")
         finally:
-            cursor.close()   
-        
+            cursor.close()
 
     session.clear()
     response = make_response(redirect(url_for("login")))
