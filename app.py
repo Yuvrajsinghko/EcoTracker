@@ -633,12 +633,21 @@ def user_leaderboard():
     else:
         cursor = db.cursor()
 
+        # Fixed query - join through DailyEntry to avoid duplication
         cursor.execute(
             """
-            SELECT s.name,s.username,SUM(emp.points_earned) as total_points,COUNT(de.daily_id) as total_entries,
-            AVG(de.carbon_score) as avg_carbon_score 
-            FROM SignupDetails s JOIN EmployeePoints emp ON s.id=emp.user_id JOIN DailyEntry de ON s.id = de.signup_ref_id GROUP BY s.id ORDER BY total_points DESC LIMIT 10
-        """
+            SELECT s.name, s.username, 
+                   SUM(emp.points_earned) as total_points,
+                   COUNT(DISTINCT de.daily_id) as total_entries,
+                   AVG(de.carbon_score) as avg_carbon_score 
+            FROM SignupDetails s 
+            JOIN DailyEntry de ON s.id = de.signup_ref_id 
+            JOIN EmployeePoints emp ON de.user_point_id_ref = emp.emp_point_id
+            GROUP BY s.id, s.name, s.username
+            ORDER BY total_points DESC 
+            LIMIT 10
+            
+            """
         )
 
         top_users = cursor.fetchall()
@@ -649,11 +658,20 @@ def user_leaderboard():
         if user_result:
             user_id = user_result["id"]
 
+            # Also fix the current user stats query
             cursor.execute(
-                "SELECT SUM(emp.points_earned) as my_points,COUNT(de.daily_id) as my_entries,AVG (de.carbon_score) as my_avg_carbon FROM EmployeePoints emp JOIN DailyEntry de ON emp.user_id = de.signup_ref_id WHERE emp.user_id = %s",
+                """
+                SELECT SUM(emp.points_earned) as my_points,
+                       COUNT(DISTINCT de.daily_id) as my_entries,
+                       AVG(de.carbon_score) as my_avg_carbon 
+                FROM DailyEntry de 
+                JOIN EmployeePoints emp ON de.user_point_id_ref = emp.emp_point_id
+                WHERE de.signup_ref_id = %s
+                """,
                 (user_id,),
             )
             current_user_stats = cursor.fetchone()
+        
         cursor.close()
 
         return render_template(
@@ -662,7 +680,6 @@ def user_leaderboard():
             current_user_stats=current_user_stats,
             username=username,
         )
-
 
 @app.route("/update_profile", methods=["POST"])
 def update_user_profile():

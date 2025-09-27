@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -121,7 +122,7 @@
         }
       }
 
-      /* Podium styling */
+      /* Fixed Podium styling */
       .podium-container {
         display: flex;
         justify-content: center;
@@ -133,6 +134,7 @@
       .podium-place {
         text-align: center;
         transition: all 0.3s ease;
+        max-width: 200px;
       }
       .podium-place:hover {
         transform: scale(1.05);
@@ -154,28 +156,75 @@
         box-shadow: 0 5px 15px rgba(0, 191, 255, 0.3);
       }
 
+      /* Fixed podium base with flexible height */
       .podium-base {
         border-radius: 10px;
         color: white;
         font-weight: bold;
-        padding: 15px;
+        padding: 12px 10px;
         margin-top: 10px;
+        min-height: 90px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
       }
 
+      /* Adjusted heights for better content fit */
       .gold-base {
         background: linear-gradient(135deg, #f0d806, #f39c12);
-        height: 100px;
+        min-height: 110px;
         box-shadow: 0 8px 20px rgba(240, 216, 6, 0.4);
       }
       .silver-base {
         background: linear-gradient(135deg, #95a5a6, #7f8c8d);
-        height: 80px;
+        min-height: 95px;
         box-shadow: 0 6px 16px rgba(149, 165, 166, 0.4);
       }
       .bronze-base {
         background: linear-gradient(135deg, #e67e22, #d35400);
-        height: 60px;
+        min-height: 80px;
         box-shadow: 0 4px 12px rgba(230, 126, 34, 0.4);
+      }
+
+      /* Better text sizing for podium content */
+      .podium-points {
+        font-size: 1.3rem;
+        font-weight: bold;
+        margin-bottom: 2px;
+        line-height: 1.2;
+      }
+
+      .podium-points-label {
+        font-size: 0.85rem;
+        opacity: 0.9;
+        margin-bottom: 3px;
+      }
+
+      .podium-entries {
+        font-size: 0.8rem;
+        opacity: 0.85;
+        line-height: 1.1;
+      }
+
+      /* User name styling with better overflow handling */
+      .podium-user-name {
+        font-size: 0.95rem;
+        font-weight: bold;
+        margin-bottom: 3px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
+        line-height: 1.2;
+      }
+
+      .podium-username {
+        font-size: 0.8rem;
+        opacity: 0.8;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
       }
 
       /* Table styling to match theme */
@@ -278,6 +327,22 @@
           max-width: 250px;
           margin-bottom: 15px;
         }
+        
+        .podium-base {
+          min-height: 80px;
+        }
+        
+        .gold-base {
+          min-height: 90px;
+        }
+        
+        .silver-base {
+          min-height: 85px;
+        }
+        
+        .bronze-base {
+          min-height: 75px;
+        }
       }
     </style>
   </head>
@@ -338,22 +403,19 @@
               <div class="row text-center">
                 <div class="col-md-4">
                   <div class="metric-value">
-                    {{ current_user_stats.my_points|int if
-                    current_user_stats.my_points else 0 }}
+                    {{ current_user_stats.my_points|int if current_user_stats.my_points else 0 }}
                   </div>
                   <small class="text-light">Total Points</small>
                 </div>
                 <div class="col-md-4">
                   <div class="metric-value">
-                    {{ current_user_stats.my_entries if
-                    current_user_stats.my_entries else 0 }}
+                    {{ current_user_stats.my_entries if current_user_stats.my_entries else 0 }}
                   </div>
                   <small class="text-light">Entries Made</small>
                 </div>
                 <div class="col-md-4">
                   <div class="metric-value">
-                    {{ "%.1f"|format(current_user_stats.my_avg_carbon|float) if
-                    current_user_stats.my_avg_carbon else "0.0" }}
+                    {{ "%.1f"|format(current_user_stats.my_avg_carbon|float) if current_user_stats.my_avg_carbon else "0.0" }}
                   </div>
                   <small class="text-light">Avg Carbon Score</small>
                 </div>
@@ -361,26 +423,22 @@
             </div>
             {% endif %}
 
-            <!-- Top 3 Podium -->
             {% if top_users %}
+            <!-- Top 3 Podium -->
             <h4 class="crown-header text-center mb-4">👑 Top Performers</h4>
             <div class="podium-container">
               {% for user in top_users[:3] %}
               <div class="podium-place">
                 <div class="crown-icon">
-                  {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% else
-                  %}🥉{% endif %}
+                  {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% else %}🥉{% endif %}
                 </div>
                 <div class="podium-avatar">{{ user.name[0].upper() }}</div>
-                <h6 class="text-white fw-bold">{{ user.name }}</h6>
-                <small class="text-light">@{{ user.username }}</small>
-                <div
-                  class="podium-base {% if loop.index == 1 %}gold-base{% elif loop.index == 2 %}silver-base{% else %}bronze-base{% endif %}"
-                >
-                  <div class="fs-5">{{ user.total_points|int }}</div>
-                  <small>Points</small>
-                  <br />
-                  <small>{{ user.total_entries }} entries</small>
+                <h6 class="text-white podium-user-name">{{ user.name }}</h6>
+                <small class="text-light podium-username">@{{ user.username }}</small>
+                <div class="podium-base {% if loop.index == 1 %}gold-base{% elif loop.index == 2 %}silver-base{% else %}bronze-base{% endif %}">
+                  <div class="podium-points">{{ user.total_points|int }}</div>
+                  <div class="podium-points-label">Points</div>
+                  <div class="podium-entries">{{ user.total_entries }} entries</div>
                 </div>
               </div>
               {% endfor %}
@@ -401,18 +459,11 @@
                 </thead>
                 <tbody>
                   {% for user in top_users %}
-                  <tr
-                    class="table-row {% if username == user.username %}current-user-row{% endif %}"
-                  >
-                    <td>
-                      <span class="rank-badge">{{ loop.index }}</span>
-                    </td>
+                  <tr class="table-row {% if username == user.username %}current-user-row{% endif %}">
+                    <td><span class="rank-badge">{{ loop.index }}</span></td>
                     <td>
                       <div class="d-flex align-items-center">
-                        <div
-                          class="podium-avatar me-3"
-                          style="width: 35px; height: 35px; font-size: 1rem"
-                        >
+                        <div class="podium-avatar me-3" style="width: 35px; height: 35px; font-size: 1rem">
                           {{ user.name[0].upper() }}
                         </div>
                         <div>
@@ -421,15 +472,9 @@
                         </div>
                       </div>
                     </td>
-                    <td class="text-center fw-bold text-warning">
-                      {{ user.total_points|int }}
-                    </td>
-                    <td class="text-center text-info">
-                      {{ user.total_entries }}
-                    </td>
-                    <td class="text-center text-success">
-                      {{ "%.1f"|format(user.avg_carbon_score|float) }}
-                    </td>
+                    <td class="text-center fw-bold text-warning">{{ user.total_points|int }}</td>
+                    <td class="text-center text-info">{{ user.total_entries }}</td>
+                    <td class="text-center text-success">{{ "%.1f"|format(user.avg_carbon_score|float) }}</td>
                   </tr>
                   {% endfor %}
                 </tbody>
@@ -439,10 +484,7 @@
             <div class="text-center text-light py-5">
               <h4>No data available yet!</h4>
               <p>Start making daily entries to see the leaderboard</p>
-              <a
-                href="{{ url_for('daily_user_entry') }}"
-                class="btn btn-neon mt-3"
-              >
+              <a href="{{ url_for('daily_user_entry') }}" class="btn btn-neon mt-3">
                 Make Your First Entry
               </a>
             </div>
@@ -450,10 +492,7 @@
 
             <!-- Action Buttons -->
             <div class="text-center mt-4">
-              <a
-                href="{{ url_for('daily_user_entry') }}"
-                class="btn btn-neon me-3"
-              >
+              <a href="{{ url_for('daily_user_entry') }}" class="btn btn-neon me-3">
                 📝 Add Daily Entry
               </a>
             </div>
@@ -484,4 +523,4 @@
       resetTimer();
     </script>
   </body>
-</html>
+</html>11
