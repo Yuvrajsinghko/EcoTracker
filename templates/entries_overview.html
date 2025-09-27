@@ -1,110 +1,8 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Entries Overview</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <style>
-      body {
-        min-height: 100vh;
-        background: no-repeat center center/cover;
-        transition: background 0.5s ease-in-out;
-      }
-      .entry-row {
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 8px;
-        padding: 10px 15px;
-        margin: 6px 0;
-        font-size: 0.95rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-        transition: transform 0.2s ease, background 0.3s ease;
-      }
-      .entry-row:hover {
-        transform: scale(1.02);
-        background: rgba(0, 123, 255, 0.1);
-        cursor: pointer;
-      }
-      .page-title {
-        color: #fff;
-        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
-        margin-top: 80px;
-      }
-      .top-buttons {
-        position: absolute;
-        top: 15px;
-        right: 20px;
-        display: flex;
-        gap: 10px;
-      }
-      .btn-glow {
-        color: #fff;
-        text-transform: uppercase;
-        font-weight: bold;
-        padding: 6px 14px;
-        border: none;
-        border-radius: 5px;
-        background: #007bff;
-        text-decoration: none;
-        transition: box-shadow 0.3s ease, transform 0.2s ease;
-      }
-      .btn-glow:hover {
-        box-shadow: 0 0 8px #0ff, 0 0 16px #00f;
-      }
-      .btn-glow:active {
-        box-shadow: 0 0 12px #0ff, 0 0 24px #00f;
-        transform: scale(0.96);
-      }
-      .entry-actions {
-        display: flex;
-        gap: 8px;
-      }
-      .entry-actions a {
-        font-size: 0.8rem;
-        padding: 4px 8px;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="top-buttons">
-      <a href="{{url_for('logout')}}" class="btn-glow">Logout</a>
-    </div>
-    <div class="container">
-      <h2 class="text-center mb-4 page-title">Your Daily Entries</h2>
-      <div class="list-group">
-        {% for entry in entries %}
-        <div class="entry-row">
-          <div onclick="location.href='/entry/{{ entry.daily_id }}'" style="flex-grow:1; cursor:pointer;">
-            <span><strong>Date:</strong> {{ entry.date_of_entry }}</span> |
-            <span><strong>Carbon Score:</strong> {{ entry.carbon_score }}</span>
-          </div>
-          <div class="entry-actions">
-            <a href="{{url_for('edit_entry', entry_id = entry.daily_id)}}" class="btn btn-sm btn-primary">Edit</a>
-            <a href="{{url_for('delete_entry', entry_id = entry.daily_id)}}" class="btn btn-sm btn-danger">Delete</a>
-          </div>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-
-    <script>
-      // Random background image
-      const images = ["/static/images/img4.png"];
-      document.body.style.backgroundImage = `url(${
-        images[Math.floor(Math.random() * images.length)]
-      })`;
-    </script>
-  </body>
-</html> -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Entries Overview</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
@@ -112,99 +10,399 @@
     />
     <style>
       body {
+        background: url(/static/images/img4.png) no-repeat center center/cover;
         min-height: 100vh;
-        background: no-repeat center center/cover;
-        transition: background 0.5s ease-in-out;
+        padding-top: 80px;
+        position: relative;
       }
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.1);
+        z-index: -1;
+      }
+
+      /* Navbar */
+      .navbar {
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+      }
+      .nav-link {
+        font-weight: 500;
+        transition: all 0.3s ease-in-out;
+      }
+      .nav-link[href*="daily_user_entry"] {
+        color: #00e0b8 !important;
+        text-shadow: 0 0 0.5px #00e0b8;
+      }
+      .nav-link[href*="profile"] {
+        color: #00bfff !important;
+        text-shadow: 0 0 2px #00bfff;
+      }
+      .nav-link.text-danger {
+        color: #ff00ff !important;
+        text-shadow: 0 0 2px #ff00ff;
+      }
+      .nav-link:hover {
+        color: #000 !important;
+        background: rgba(0, 224, 184, 0.2);
+        border-radius: 6px;
+        text-shadow: 0 0 4px #00e0b8, 0 0 8px #00e0b8;
+        transform: scale(1.01);
+      }
+      .nav-link.text-danger:hover {
+        background: rgba(255, 0, 255, 0.15);
+        text-shadow: 0 0 1px #ff00ff;
+        box-shadow: 0 0 2px #ff00ff;
+      }
+
+      /* Hero Neon */
+      .hero-neon {
+        color: #00bfff;
+        text-shadow: 0 0 6px #00bfff, 0 0 12px #00bfff, 0 0 24px #00bfff;
+        animation: heroPulse 3s infinite ease-in-out;
+      }
+      @keyframes heroPulse {
+        0% {
+          text-shadow: 0 0 6px #00bfff, 0 0 12px #00bfff;
+        }
+        50% {
+          text-shadow: 0 0 12px #00bfff, 0 0 24px #00bfff, 0 0 36px #00bfff;
+        }
+        100% {
+          text-shadow: 0 0 6px #00bfff, 0 0 12px #00bfff;
+        }
+      }
+
+      /* Entries Container */
+      .entries-container {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 15px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+
+      /* Entry Rows */
       .entry-row {
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 8px;
-        padding: 10px 15px;
-        margin: 6px 0;
-        font-size: 0.95rem;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        margin: 12px 0;
+        padding: 16px 20px;
+        transition: all 0.3s ease-in-out;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
         display: flex;
         justify-content: space-between;
         align-items: center;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-        transition: transform 0.2s ease, background 0.3s ease;
       }
+
       .entry-row:hover {
-        transform: scale(1.02);
-        background: rgba(0, 123, 255, 0.1);
+        transform: translateY(-2px) scale(1.01);
+        background: rgba(0, 191, 255, 0.12);
+        box-shadow: 0 8px 24px rgba(0, 191, 255, 0.3),
+          0 0 20px rgba(0, 191, 255, 0.2);
+        border: 1px solid rgba(0, 191, 255, 0.4);
+      }
+
+      .entry-content {
+        color: #ffffff;
+        font-weight: 500;
+        text-shadow: 0 0 1px rgba(255, 255, 255, 0.8);
+        flex-grow: 1;
         cursor: pointer;
       }
-      .page-title {
-        color: #fff;
-        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
-        margin-top: 80px;
+
+      .entry-content span {
+        margin-right: 15px;
       }
-      .top-buttons {
-        position: absolute;
-        top: 15px;
-        right: 20px;
-        display: flex;
-        gap: 10px;
+
+      .entry-content strong {
+        color: #00e0b8;
+        text-shadow: 0 0 2px #00e0b8;
       }
-      .btn-glow {
-        color: #fff;
-        text-transform: uppercase;
-        font-weight: bold;
-        padding: 6px 14px;
-        border: none;
-        border-radius: 5px;
-        background: #007bff;
-        text-decoration: none;
-        transition: box-shadow 0.3s ease, transform 0.2s ease;
-      }
-      .btn-glow:hover {
-        box-shadow: 0 0 8px #0ff, 0 0 16px #00f;
-      }
-      .btn-glow:active {
-        box-shadow: 0 0 12px #0ff, 0 0 24px #00f;
-        transform: scale(0.96);
-      }
+
+      /* Action Buttons */
       .entry-actions {
         display: flex;
         gap: 8px;
       }
-      .entry-actions a {
+
+      .btn-edit {
+        background: transparent;
+        color: #66f0d4;
+        border: 1px solid #66f0d4;
         font-size: 0.8rem;
-        padding: 4px 8px;
+        padding: 6px 12px;
+        border-radius: 6px;
+        text-transform: uppercase;
+        font-weight: bold;
+        transition: all 0.3s ease-in-out;
+        text-shadow: 0 0 1px #66f0d4;
+        box-shadow: 0 0 2px #66f0d4;
+      }
+
+      .btn-edit:hover {
+        background: rgba(102, 240, 212, 0.15);
+        color: #66f0d4;
+        box-shadow: 0 0 4px #66f0d4, 0 0 8px #66f0d4;
+        transform: scale(1.05);
+      }
+
+      .btn-delete {
+        background: transparent;
+        color: #ff4d88;
+        border: 1px solid #ff4d88;
+        font-size: 0.8rem;
+        padding: 6px 12px;
+        border-radius: 6px;
+        text-transform: uppercase;
+        font-weight: bold;
+        transition: all 0.3s ease-in-out;
+        text-shadow: 0 0 1px #ff4d88;
+        box-shadow: 0 0 2px #ff4d88;
+      }
+
+      .btn-delete:hover {
+        background: rgba(255, 77, 136, 0.15);
+        color: #ff4d88;
+        box-shadow: 0 0 4px #ff4d88, 0 0 8px #ff4d88;
+        transform: scale(1.05);
+      }
+
+      /* Empty State */
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .empty-state h4 {
+        color: #00bfff;
+        text-shadow: 0 0 4px #00bfff;
+        margin-bottom: 20px;
+      }
+
+      /* Create Entry Button */
+      .btn-create {
+        background: transparent;
+        color: #00e0b8;
+        font-weight: bold;
+        border: 2px solid #00e0b8;
+        border-radius: 8px;
+        text-transform: uppercase;
+        text-shadow: 0 0 2px #00e0b8;
+        box-shadow: 0 0 4px #00e0b8, 0 0 8px #00e0b8;
+        transition: all 0.3s ease-in-out;
+        padding: 12px 24px;
+        font-size: 1.1rem;
+        margin-bottom: 30px;
+      }
+
+      .btn-create:hover {
+        background: rgba(0, 224, 184, 0.15);
+        color: #00e0b8;
+        box-shadow: 0 0 8px #00e0b8, 0 0 16px #00e0b8;
+        transform: scale(1.05);
+      }
+
+      /* Statistics Cards */
+      .stats-row {
+        margin-bottom: 30px;
+      }
+
+      .stat-card {
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        transition: all 0.3s ease-in-out;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      }
+
+      .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #00e0b8;
+        text-shadow: 0 0 4px #00e0b8;
+      }
+
+      .stat-label {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
       }
     </style>
   </head>
   <body>
-    <div class="top-buttons">
-      <a href="{{url_for('daily_user_entry')}}" class="btn-glow">Create Entries</a>
-      <a href="{{url_for('logout')}}" class="btn-glow">Logout</a>
-    </div>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container-fluid">
+        <a
+          class="navbar-brand fw-bold hero-neon"
+          href="{{ url_for('registration_done') }}"
+          >Carbon Tracker</a
+        >
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('user_leaderboard') }}">
+                <i class="fas fa-trophy me-1"></i>Leaderboard
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('daily_user_entry') }}"
+                >Home</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('profile') }}">Profile</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-danger" href="{{ url_for('logout') }}"
+                >Logout</a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
     <div class="container">
-      <h2 class="text-center mb-4 page-title">Your Daily Entries</h2>
-      <div class="list-group">
-        {% for entry in entries %}
-        <div class="entry-row">
-          <div onclick="location.href='/entry/{{ entry.daily_id }}'" style="flex-grow:1; cursor:pointer;">
-            <span><strong>Date:</strong> {{ entry.date_of_entry }}</span> |
-            <span><strong>Carbon Score:</strong> {{ entry.carbon_score }}</span>
-          </div>
-          <div class="entry-actions">
-            <a href="{{url_for('edit_entry', entry_id = entry.daily_id)}}" class="btn btn-sm btn-primary">Edit</a>
-            <a href="{{url_for('delete_entry', entry_id = entry.daily_id)}}" class="btn btn-sm btn-danger">Delete</a>
+      <div class="row justify-content-center">
+        <div class="col-lg-10">
+          <div class="entries-container p-4">
+            <h2 class="text-center mb-4 hero-neon">Your Daily Entries</h2>
+
+            <!-- Create Entry Button -->
+            <div class="text-center mb-4">
+              <a href="{{url_for('daily_user_entry')}}" class="btn btn-create">
+                Create New Entry
+              </a>
+            </div>
+
+            <!-- Statistics Row (Optional - you can remove if not needed) -->
+            <div class="row stats-row">
+              <div class="col-md-4">
+                <div class="stat-card">
+                  <div class="stat-value">{{ entries|length }}</div>
+                  <div class="stat-label">Total Entries</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="stat-card">
+                  <div class="stat-value">
+                    {% set total_score = entries|sum(attribute='carbon_score')
+                    %} {{ "%.1f"|format(total_score) }}
+                  </div>
+                  <div class="stat-label">Total Carbon Score</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="stat-card">
+                  <div class="stat-value">
+                    {% set total_points = entries|sum(attribute='points_earned')
+                    %} {{ total_points }}
+                  </div>
+                  <div class="stat-label">Total Green Points</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Entries List -->
+            <div class="entries-list">
+              {% if entries %} {% for entry in entries %}
+              <div class="entry-row">
+                <div
+                  class="entry-content"
+                  onclick="location.href='/entry/{{ entry.daily_id }}'"
+                >
+                  <span><strong>Date:</strong> {{ entry.date_of_entry }}</span>
+                  <span
+                    ><strong>Carbon Score:</strong> {{ entry.carbon_score
+                    }}</span
+                  >
+                  <span
+                    ><strong>Green Points:</strong> {{ entry.points_earned
+                    }}</span
+                  >
+                </div>
+                <div class="entry-actions">
+                  <a
+                    href="{{url_for('edit_entry', entry_id = entry.daily_id)}}"
+                    class="btn btn-edit"
+                    >Edit</a
+                  >
+                  <a
+                    href="{{url_for('delete_entry', entry_id = entry.daily_id)}}"
+                    class="btn btn-delete"
+                    >Delete</a
+                  >
+                </div>
+              </div>
+              {% endfor %} {% else %}
+              <div class="empty-state">
+                <h4>No Entries Yet</h4>
+                <p>
+                  Start tracking your carbon footprint by creating your first
+                  daily entry!
+                </p>
+                <a
+                  href="{{url_for('daily_user_entry')}}"
+                  class="btn btn-create"
+                >
+                  Create Your First Entry
+                </a>
+              </div>
+              {% endif %}
+            </div>
           </div>
         </div>
-        {% endfor %}
       </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      // Random background image
-      const images = ["/static/images/img4.png"];
-      document.body.style.backgroundImage = `url(${
-        images[Math.floor(Math.random() * images.length)]
-      })`;
+      // Auto-logout after inactivity (client-side only)
+      let inactivityLimit = 5 * 60 * 1000; // 5 minutes
+      let inactivityTimer;
+
+      function resetTimer() {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(() => {
+          window.location.href = "{{ url_for('logout') }}"; // Force logout
+        }, inactivityLimit);
+      }
+
+      // Reset timer when user interacts
+      ["mousemove", "keydown", "click", "scroll"].forEach((event) => {
+        window.addEventListener(event, resetTimer);
+      });
+
+      // Start timer
+      resetTimer();
     </script>
   </body>
 </html>
-
-
-
