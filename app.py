@@ -222,12 +222,23 @@ def register():
     cursor.execute(
         "SELECT username email FROM SignupDetails WHERE username = %s ", (u_sername,)
     )
-    user = cursor.fetchone()
-
-    if user:
+    user_name = cursor.fetchone()
+    cursor.execute(
+        "SELECT username email FROM SignupDetails WHERE username = %s ", (u_sername,)
+    )
+    user_name = cursor.fetchone()
+    cursor.execute(
+        "SELECT email FROM SignupDetails WHERE username = %s ", (email,)
+    )
+    user_email = cursor.fetchone()
+    
+    print(user_name)
+    if user_name:
         flash("Username already exist", "danger")
         return redirect(url_for("signup"))
-    
+    if user_email:
+        flash("Email already exist", "danger")
+        return redirect(url_for("signup"))
     else:
         if not (4 <= len(name) <= 16):
             errors.append("Name must be 4-16 characters long.")
