@@ -176,6 +176,7 @@ cython_debug/
 #.idea/
 .idea/
 .vscode/
+ myvenv/
 # Abstra
 # Abstra is an AI-powered process automation framework.
 # Ignore directories containing user credentials, local state, and settings.
