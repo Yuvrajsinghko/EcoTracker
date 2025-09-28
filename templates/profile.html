@@ -2,196 +2,751 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>User Profile</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
-      background: url('/static/images/img.jpg') no-repeat center center fixed;
-      background-size: cover;
+      background: url(/static/images/img.jpg) no-repeat center center/cover;
+      min-height: 100vh;
+      padding-top: 80px;
+      position: relative;
     }
-    .profile-card {
-      max-width: 600px;
-      margin: 80px auto;
-      padding: 30px;
-      border-radius: 20px;
-      backdrop-filter: blur(12px);
-      background: rgba(255, 255, 255, 0.15);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-      color: white;
-    }
-    .profile-card h2 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .profile-info p {
-      font-size: 1.1rem;
-      margin: 5px 0;
-    }
-    /* Top right buttons - keeping your exact styling */
-    .top-right-buttons {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      display: flex;
-      gap: 10px;
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.1);
+      z-index: -1;
     }
 
-    /* Edit form styling - keeping your exact approach */
-    .edit-form {
-      display: none; /* Hidden by default */
+    /* Profile Card - same glassmorphism as daily entry */
+    .profile-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 30px;
+      color: white;
     }
-    
-    .edit-form .form-control {
+
+    /* Navbar - same as daily entry */
+    .navbar {
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    }
+    .nav-link {
+      font-weight: 500;
+      transition: all 0.3s ease-in-out;
+    }
+    .nav-link[href*="registration_done"] {
+      color: #00e0b8 !important;
+      text-shadow: 0 0 0.5px #00e0b8;
+    }
+    .nav-link[href*="profile"] {
+      color: #00bfff !important;
+      text-shadow: 0 0 2px #00bfff;
+    }
+    .nav-link.text-danger {
+      color: #ff00ff !important;
+      text-shadow: 0 0 2px #ff00ff;
+    }
+    .nav-link:hover {
+      color: #000 !important;
+      background: rgba(0, 224, 184, 0.2);
+      border-radius: 6px;
+      text-shadow: 0 0 4px #00e0b8, 0 0 8px #00e0b8;
+      transform: scale(1.01);
+    }
+    .nav-link.text-danger:hover {
+      background: rgba(255, 0, 255, 0.15);
+      text-shadow: 0 0 1px #ff00ff;
+      box-shadow: 0 0 2px #ff00ff;
+    }
+
+    /* Hero Neon */
+    .hero-neon {
+      color: #00bfff;
+      text-shadow: 0 0 6px #00bfff, 0 0 12px #00bfff, 0 0 24px #00bfff;
+      animation: heroPulse 3s infinite ease-in-out;
+    }
+    @keyframes heroPulse {
+      0% {
+        text-shadow: 0 0 6px #00bfff, 0 0 12px #00bfff;
+      }
+      50% {
+        text-shadow: 0 0 12px #00bfff, 0 0 24px #00bfff, 0 0 36px #00bfff;
+      }
+      100% {
+        text-shadow: 0 0 6px #00bfff, 0 0 12px #00bfff;
+      }
+    }
+
+    /* Section Headers */
+    @keyframes neonPulse {
+      0% {
+        text-shadow: 0 0 4px currentColor, 0 0 8px currentColor;
+        opacity: 0.9;
+      }
+      50% {
+        text-shadow: 0 0 6px currentColor, 0 0 12px currentColor;
+        opacity: 1;
+      }
+      100% {
+        text-shadow: 0 0 4px currentColor, 0 0 8px currentColor;
+        opacity: 0.9;
+      }
+    }
+    .section-header {
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 10px 0;
+      margin: 25px 0 15px 0;
+      animation: neonPulse 2.5s infinite ease-in-out;
+      color: #5bdc06 !important;
+    }
+
+    /* Profile info styling */
+    .profile-info p {
+      font-size: 1.1rem;
+      margin: 10px 0;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    .profile-info strong {
+      color: #00bfff;
+      text-shadow: 0 0 2px #00bfff;
+    }
+
+    /* Form styling - consistent with daily entry */
+    .form-control, .form-select {
       background: rgba(255, 255, 255, 0.9);
       border: 1px solid rgba(255, 255, 255, 0.3);
       color: #333;
       margin-bottom: 10px;
+      border-radius: 8px;
+      transition: all 0.3s ease-in-out;
     }
     
-    .edit-form .form-control:focus {
+    .form-control:focus, .form-select:focus {
       background: rgba(255, 255, 255, 0.95);
-      border-color: #007bff;
-      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+      border-color: #5bdc06;
+      box-shadow: 0 0 3px #5bdc06;
+      color: #333;
     }
     
-    .edit-form label {
-      color: white;
-      font-weight: bold;
+    .form-control:hover, .form-select:hover {
+      border-color: #5bdc06;
+      box-shadow: 0 0 3px #5bdc06;
     }
 
-    /* Flash messages with your glassmorphism style */
+    /* Buttons - consistent neon styling */
+    .btn-neon {
+      background: transparent;
+      color: #66f0d4;
+      font-weight: bold;
+      border: 1px solid #66f0d4;
+      border-radius: 8px;
+      text-transform: uppercase;
+      text-shadow: 0 0 1px #66f0d4;
+      box-shadow: 0 0 2px #66f0d4, 0 0 4px #66f0d4;
+      transition: all 0.3s ease-in-out;
+      padding: 8px 16px;
+    }
+    .btn-neon:hover {
+      background: rgba(102, 240, 212, 0.15);
+      color: #66f0d4;
+      box-shadow: 0 0 4px #66f0d4, 0 0 8px #66f0d4;
+      transform: scale(1.02);
+    }
+
+    /* Specialized button colors */
+    .btn-edit {
+      color: #f0d806;
+      border-color: #f0d806;
+      text-shadow: 0 0 1px #f0d806;
+      box-shadow: 0 0 2px #f0d806, 0 0 4px #f0d806;
+    }
+    .btn-edit:hover {
+      background: rgba(240, 216, 6, 0.15);
+      color: #f0d806;
+      box-shadow: 0 0 4px #f0d806, 0 0 8px #f0d806;
+    }
+
+    .btn-password {
+      color: #5bdc06;
+      border-color: #5bdc06;
+      text-shadow: 0 0 1px #5bdc06;
+      box-shadow: 0 0 2px #5bdc06, 0 0 4px #5bdc06;
+    }
+    .btn-password:hover {
+      background: rgba(91, 220, 6, 0.15);
+      color: #5bdc06;
+      box-shadow: 0 0 4px #5bdc06, 0 0 8px #5bdc06;
+    }
+
+    .btn-delete {
+      color: #ff4d88;
+      border-color: #ff4d88;
+      text-shadow: 0 0 1px #ff4d88;
+      box-shadow: 0 0 2px #ff4d88, 0 0 4px #ff4d88;
+    }
+    .btn-delete:hover {
+      background: rgba(255, 77, 136, 0.15);
+      color: #ff4d88;
+      box-shadow: 0 0 4px #ff4d88, 0 0 8px #ff4d88;
+    }
+
+    /* Flash Messages - consistent with toasts */
     .custom-alert {
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.3);
       backdrop-filter: blur(10px);
-      border-radius: 15px;
+      border-radius: 12px;
       margin-bottom: 20px;
       padding: 15px;
       color: white;
+      text-shadow: 0 0 1px currentColor;
     }
     
     .custom-alert.success {
-      background: rgba(40, 167, 69, 0.2);
-      border-color: rgba(40, 167, 69, 0.3);
+      background: rgba(0, 255, 128, 0.08);
+      color: #00e0b8;
+      border-color: rgba(0, 224, 184, 0.5);
+      box-shadow: 0 0 6px rgba(0, 224, 184, 0.6);
     }
     
     .custom-alert.error {
-      background: rgba(220, 53, 69, 0.2);
-      border-color: rgba(220, 53, 69, 0.3);
+      background: rgba(255, 0, 100, 0.08);
+      color: #ff4d88;
+      border-color: rgba(255, 77, 136, 0.5);
+      box-shadow: 0 0 6px rgba(255, 77, 136, 0.6);
+    }
+
+    /* Password display styling */
+    .password-display {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .password-toggle {
+      background: none;
+      border: none;
+      color: #66f0d4;
+      cursor: pointer;
+      font-size: 0.9rem;
+      text-shadow: 0 0 1px #66f0d4;
+      transition: all 0.3s ease;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    .password-toggle:hover {
+      background: rgba(102, 240, 212, 0.15);
+      box-shadow: 0 0 4px #66f0d4;
+    }
+
+    /* Divider for sections */
+    .section-divider {
+      border-top: 1px solid rgba(255, 255, 255, 0.3);
+      margin: 20px 0;
+      padding-top: 15px;
+    }
+
+    /* Edit and password forms */
+    .edit-form, .password-form {
+      display: none;
+    }
+
+    .edit-form label, .password-form label {
+      color: #00bfff;
+      font-weight: bold;
+      text-shadow: 0 0 1px #00bfff;
+      margin-bottom: 5px;
+    }
+
+    /* Delete Confirmation Popup - enhanced glassmorphism */
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .popup-overlay.show {
+      display: flex;
+    }
+
+    .delete-popup {
+      max-width: 500px;
+      width: 90%;
+      padding: 30px;
+      border-radius: 15px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: rgba(255, 77, 136, 0.1);
+      border: 1px solid rgba(255, 77, 136, 0.3);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      color: white;
+      text-align: center;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    .delete-popup h3 {
+      color: #ff4d88;
+      margin-bottom: 20px;
+      font-size: 1.8rem;
+      font-weight: bold;
+      text-shadow: 0 0 4px #ff4d88, 0 0 8px #ff4d88;
+      animation: neonPulse 2.5s infinite ease-in-out;
+    }
+
+    .delete-popup .warning-icon {
+      font-size: 3rem;
+      color: #ff4d88;
+      margin-bottom: 15px;
+      display: block;
+      text-shadow: 0 0 6px #ff4d88, 0 0 12px #ff4d88;
+      animation: heroPulse 3s infinite ease-in-out;
+    }
+
+    .delete-popup p {
+      font-size: 1.1rem;
+      margin-bottom: 15px;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .delete-popup .consequences {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 10px;
+      padding: 15px;
+      margin: 20px 0;
+      text-align: left;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .delete-popup .consequences ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .delete-popup .consequences li {
+      margin: 8px 0;
+      font-size: 1rem;
+    }
+
+    .delete-popup .button-group {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 25px;
+    }
+
+    .delete-popup .btn-confirm-delete {
+      background: transparent;
+      border: 1px solid #ff4d88;
+      color: #ff4d88;
+      padding: 12px 25px;
+      border-radius: 8px;
+      font-weight: bold;
+      text-transform: uppercase;
+      text-shadow: 0 0 1px #ff4d88;
+      box-shadow: 0 0 2px #ff4d88, 0 0 4px #ff4d88;
+      transition: all 0.3s ease;
+    }
+
+    .delete-popup .btn-confirm-delete:hover {
+      background: rgba(255, 77, 136, 0.15);
+      box-shadow: 0 0 4px #ff4d88, 0 0 8px #ff4d88;
+      transform: scale(1.02);
+    }
+
+    .delete-popup .btn-cancel {
+      background: transparent;
+      border: 1px solid #66f0d4;
+      color: #66f0d4;
+      padding: 12px 25px;
+      border-radius: 8px;
+      font-weight: bold;
+      text-transform: uppercase;
+      text-shadow: 0 0 1px #66f0d4;
+      box-shadow: 0 0 2px #66f0d4, 0 0 4px #66f0d4;
+      transition: all 0.3s ease;
+    }
+
+    .delete-popup .btn-cancel:hover {
+      background: rgba(102, 240, 212, 0.15);
+      box-shadow: 0 0 4px #66f0d4, 0 0 8px #66f0d4;
+      transform: scale(1.02);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideIn {
+      from { 
+        opacity: 0;
+        transform: translateY(-30px) scale(0.9);
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      .profile-card {
+        margin: 10px;
+        padding: 20px;
+      }
+      
+      .delete-popup {
+        margin: 20px;
+        padding: 20px;
+      }
+
+      .delete-popup .button-group {
+        flex-direction: column;
+        gap: 10px;
+      }
     }
   </style>
 </head>
 <body>
   
-  <!-- Top Right Buttons - keeping your exact structure -->
-  <div class="top-right-buttons">
-    <a href="/success" class="btn btn-light">Home</a>
-    <a href="/entries_overview" class="btn btn-info">Show Entries</a>
-    <a href="/logout" class="btn btn-danger">Logout</a>
-  </div>
+  <!-- Navbar - same as daily entry -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold hero-neon" href="{{ url_for('registration_done') }}">Carbon Tracker</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('registration_done') }}">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('user_leaderboard') }}">
+              <i class="fas fa-trophy me-1"></i>Leaderboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('user_insights') }}">Insights</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('simple_report') }}">Monthly Report</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/entries_overview">Show Entries</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('profile') }}">Profile</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-danger" href="{{ url_for('logout') }}">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
 
-  <div class="profile-card">
-    <h2>User Profile</h2>
-    
-    <!-- Flash Messages with your styling -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="custom-alert {{ category }}">
-            {% if category == 'success' %}✅{% else %}❌{% endif %} {{ message }}
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="profile-card">
+          <h2 class="text-center mb-4 hero-neon">User Profile</h2>
+          
+          <!-- Flash Messages -->
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                <div class="custom-alert {{ category }}">
+                  {% if category == 'success' %}✅{% else %}❌{% endif %} {{ message }}
+                </div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+          
+          <!-- DISPLAY MODE -->
+          <div id="display-mode">
+            <h5 class="section-header">Profile Information</h5>
+            <div class="profile-info">
+              <p><strong>Name:</strong> {{ user.name }}</p>
+              <p><strong>Age:</strong> {{ user.age }}</p>
+              <p><strong>Gender:</strong> {{ user.gender }}</p>
+              <p><strong>Phone:</strong> {{ user.phone_no }}</p>
+              <p><strong>Email:</strong> {{ user.email }}</p>
+              <p><strong>Username:</strong> {{ user.username }}</p>
+              <p><strong>Password:</strong> 
+                <span class="password-display">
+                  <span id="password-text">***********</span>
+                  <button type="button" class="password-toggle" onclick="togglePassword()" title="Show/Hide Password">
+                    <span id="toggle-icon">Show</span>
+                  </button>
+                </span>
+              </p>
+              <p><strong>Date Joined:</strong> {{ user.date_joined }}</p>
+            </div>
+            
+            <div class="section-divider"></div>
+            
+            <!-- Action buttons -->
+            <div class="text-center">
+              <button class="btn btn-edit btn-neon" onclick="showEditForm()">✏️ Edit Profile</button>
+              <button class="btn btn-password btn-neon ms-2" onclick="showPasswordForm()">🔒 Change Password</button>
+              <button class="btn btn-delete btn-neon ms-2" onclick="showDeletePopup()">🗑️ Delete Account</button>
+            </div>
           </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-    
-    <!-- DISPLAY MODE - keeping your exact layout -->
-    <div id="display-mode">
-      <div class="profile-info">
-        <p><strong>Name:</strong> {{ user.name }}</p>
-        <p><strong>Age:</strong> {{ user.age }}</p>
-        <p><strong>Gender:</strong> {{ user.gender }}</p>
-        <p><strong>Phone:</strong> {{ user.phone_no }}</p>
-        <p><strong>Email:</strong> {{ user.email }}</p>
-        <p><strong>Username:</strong> {{ user.username }}</p>
-        <p><strong>Password:</strong><b>***********</b></p>
-        <p><strong>Date Joined:</strong> {{ user.date_joined }}</p>
-      </div>
-      <!-- Edit button styled to match your theme -->
-      <div class="text-center mt-4">
-        <button class="btn btn-warning" onclick="showEditForm()">✏️ Edit Profile</button>
-        <button class="btn btn-danger ms-2" onclick="confirmDelete()">🗑️ Delete Account</button>
-      </div>
-    </div>
-    
-    <!-- EDIT MODE - keeping your exact structure and styling -->
-    <div id="edit-mode" class="edit-form">
-      <form method="POST" action="/update_profile">
-        <div class="profile-info">
-          <p><strong>Name:</strong><br>
-            <input type="text" class="form-control" name="name" value="{{ user.name }}" required>
-          </p>
           
-          <p><strong>Age:</strong><br>
-            <input type="number" class="form-control" name="age" value="{{ user.age }}" min="1" max="120" required>
-          </p>
-          
-          <p><strong>Gender:</strong><br>
-            <select class="form-control" name="gender" required>
-              <option value="Male" {% if user.gender == 'Male' %}selected{% endif %}>Male</option>
-              <option value="Female" {% if user.gender == 'Female' %}selected{% endif %}>Female</option>
-              <option value="Other" {% if user.gender == 'Other' %}selected{% endif %}>Other</option>
-            </select>
-          </p>
-          
-          <p><strong>Username:</strong> {{ user.username }} <em>(cannot be changed)</em></p>
-          <p><strong>Password:</strong><br>
-            <input type="password" class="form-control" name="password" value="{{ user.user_password }}" required>
-          </p>
-          <p><strong>Phone:</strong><br>
-            <input type="tel" class="form-control" name="phone_no" value="{{ user.phone_no }}" required>
-          </p>
-          
-          <p><strong>Email:</strong><br>
-            <input type="email" class="form-control" name="email" value="{{ user.email }}" required>
-          </p>
-          
-          <p><strong>Date Joined:</strong> {{ user.date_joined }}</p>
+          <!-- EDIT PROFILE MODE -->
+          <div id="edit-mode" class="edit-form">
+            <h5 class="section-header">Edit Profile Information</h5>
+            <form method="POST" action="/update_profile">
+              <div class="profile-info">
+                <div class="mb-3">
+                  <label class="form-label">Name <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" name="name" value="{{ user.name }}" required>
+                </div>
+                
+                <div class="mb-3">
+                  <label class="form-label">Age <span class="text-danger">*</span></label>
+                  <input type="number" class="form-control" name="age" value="{{ user.age }}" min="1" max="120" required>
+                </div>
+                
+                <div class="mb-3">
+                  <label class="form-label">Gender <span class="text-danger">*</span></label>
+                  <select class="form-select" name="gender" required>
+                    <option value="Male" {% if user.gender == 'Male' %}selected{% endif %}>Male</option>
+                    <option value="Female" {% if user.gender == 'Female' %}selected{% endif %}>Female</option>
+                    <option value="Other" {% if user.gender == 'Other' %}selected{% endif %}>Other</option>
+                  </select>
+                </div>
+                
+                <div class="mb-3">
+                  <label class="form-label">Phone <span class="text-danger">*</span></label>
+                  <input type="tel" class="form-control" name="phone_no" value="{{ user.phone_no }}" required>
+                </div>
+                
+                <div class="mb-3">
+                  <label class="form-label">Email <span class="text-danger">*</span></label>
+                  <input type="email" class="form-control" name="email" value="{{ user.email }}" required>
+                </div>
+                
+                <p><strong>Username:</strong> {{ user.username }} <em>(cannot be changed)</em></p>
+                <p><strong>Date Joined:</strong> {{ user.date_joined }}</p>
+              </div>
+              
+              <div class="text-center mt-4">
+                <button type="submit" class="btn btn-neon">💾 Save Changes</button>
+                <button type="button" class="btn btn-neon ms-2" onclick="hideEditForm()">❌ Cancel</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- CHANGE PASSWORD MODE -->
+          <div id="password-mode" class="password-form">
+            <h5 class="section-header">🔒 Change Password</h5>
+            <form method="POST" action="/change_password">
+              <div class="profile-info">
+                <div class="mb-3">
+                  <label class="form-label">New Password <span class="text-danger">*</span></label>
+                  <input type="password" class="form-control" name="new_password" placeholder="Enter new password" minlength="6" required>
+                </div>
+                
+                <div class="mb-3">
+                  <label class="form-label">Confirm New Password <span class="text-danger">*</span></label>
+                  <input type="password" class="form-control" name="confirm_password" placeholder="Confirm new password" minlength="6" required>
+                </div>
+              </div>
+              
+              <div class="text-center mt-4">
+                <button type="submit" class="btn btn-neon">🔐 Update Password</button>
+                <button type="button" class="btn btn-neon ms-2" onclick="hidePasswordForm()">❌ Cancel</button>
+              </div>
+            </form>
+          </div>
         </div>
-        
-        <div class="text-center mt-4">
-          <button type="submit" class="btn btn-success">💾 Save Changes</button>
-          <button type="button" class="btn btn-secondary ms-2" onclick="hideEditForm()">❌ Cancel</button>
-        </div>
-      </form>
+      </div>
     </div>
   </div>
 
-  <!-- Only adding Bootstrap JS for potential future use - not changing any functionality -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Delete Confirmation Popup -->
+  <div class="popup-overlay" id="deletePopup">
+    <div class="delete-popup">
+      <span class="warning-icon">⚠️</span>
+      <h3>Delete Account</h3>
+      <p><strong>Are you sure you want to delete your account?</strong></p>
+      
+      <div class="consequences">
+        <p><strong>This will permanently delete:</strong></p>
+        <ul>
+          <li>Your profile information</li>
+          <li>All your daily entries</li>
+          <li>All your personal data</li>
+          <li>Your account history</li>
+        </ul>
+      </div>
+      
+      <p><strong style="color: #ff4d88;">This action cannot be undone!</strong></p>
+      
+      <div class="button-group">
+        <button class="btn-confirm-delete" onclick="confirmDelete()">
+          🗑️ Yes, Delete My Account
+        </button>
+        <button class="btn-cancel" onclick="hideDeletePopup()">
+          ❌ Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+    let passwordVisible = false;
+    
     function showEditForm() {
+      const alerts = document.querySelectorAll('.custom-alert');
+      alerts.forEach(alert => alert.remove());
+
       document.getElementById('display-mode').style.display = 'none';
       document.getElementById('edit-mode').style.display = 'block';
+      document.getElementById('password-mode').style.display = 'none';
     }
 
     function hideEditForm() {
+      const alerts = document.querySelectorAll('.custom-alert');
+      alerts.forEach(alert => alert.remove());
+
       document.getElementById('edit-mode').style.display = 'none';
+      document.getElementById('password-mode').style.display = 'none';
       document.getElementById('display-mode').style.display = 'block';
     }
 
-    function confirmDelete() {
-      if (confirm('⚠️ Are you sure you want to delete your account?\n\nThis will permanently delete:\n• Your profile\n• All your daily entries\n• All your data\n\nThis action cannot be undone!')) {
-        // Create a form and submit it
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '/delete_profile';
-        document.body.appendChild(form);
-        form.submit();
+    function showPasswordForm() {
+      const alerts = document.querySelectorAll('.custom-alert');
+      alerts.forEach(alert => alert.remove());
+
+      document.getElementById('display-mode').style.display = 'none';
+      document.getElementById('edit-mode').style.display = 'none';
+      document.getElementById('password-mode').style.display = 'block';
+    }
+
+    function hidePasswordForm() {
+      const alerts = document.querySelectorAll('.custom-alert');
+      alerts.forEach(alert => alert.remove());
+
+      document.getElementById('edit-mode').style.display = 'none';
+      document.getElementById('password-mode').style.display = 'none';
+      document.getElementById('display-mode').style.display = 'block';
+    }
+
+    function togglePassword() {
+      const passwordText = document.getElementById('password-text');
+      const toggleIcon = document.getElementById('toggle-icon');
+      
+      if (passwordVisible) {
+        passwordText.textContent = '***********';
+        toggleIcon.textContent = 'Show';
+        passwordVisible = false;
+      } else {
+        // In a real application, you'd fetch this from the server
+        // For security reasons, never store actual passwords in frontend
+        passwordText.textContent = '{{ user.masked_password or "***********" }}';
+        toggleIcon.textContent = 'Hide';
+        passwordVisible = true;
       }
     }
-  </script>
 
+    // Show delete confirmation popup
+    function showDeletePopup() {
+      document.getElementById('deletePopup').classList.add('show');
+      document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+
+    // Hide delete confirmation popup
+    function hideDeletePopup() {
+      document.getElementById('deletePopup').classList.remove('show');
+      document.body.style.overflow = 'auto'; // Restore background scrolling
+    }
+
+    // Confirm deletion and submit form
+    function confirmDelete() {
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/delete_profile';
+      document.body.appendChild(form);
+      form.submit();
+    }
+
+    // Close popup when clicking outside of it
+    document.getElementById('deletePopup').addEventListener('click', function(e) {
+      if (e.target === this) {
+        hideDeletePopup();
+      }
+    });
+
+    // Close popup with Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        hideDeletePopup();
+      }
+    });
+
+    // Password confirmation validation
+    document.addEventListener('DOMContentLoaded', function() {
+      const passwordForm = document.querySelector('#password-mode form');
+      if (passwordForm) {
+        passwordForm.addEventListener('submit', function(e) {
+          const newPassword = document.querySelector('input[name="new_password"]').value;
+          const confirmPassword = document.querySelector('input[name="confirm_password"]').value;
+          
+          if (newPassword !== confirmPassword) {
+            e.preventDefault();
+            alert('❌ New password and confirmation password do not match!');
+            return false;
+          }
+        });
+      }
+    });
+     // Auto-logout after inactivity (client-side only)
+    let inactivityLimit = 5 * 60 * 1000; // 5 minutes
+    let inactivityTimer;
+
+    function resetTimer() {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(() => {
+        window.location.href = "{{ url_for('logout') }}"; // Force logout
+      }, inactivityLimit);
+    }
+
+    // Reset timer when user interacts
+    ["mousemove", "keydown", "click", "scroll"].forEach(event => {
+      window.addEventListener(event, resetTimer);
+    });
+
+    // Start timer
+    resetTimer();
+  </script>
 </body>
 </html>
-
-

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify OTP - Carbondash</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css')}}"
+    />
+    <link
+      href="https://cdn.boxicons.com/fonts/basic/boxicons.min.css"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <form
+        action="{{ url_for('verify_otp') }}"
+        method="POST"
+        id="otpForm"
+        novalidate
+      >
+        <h1>Verify OTP</h1>
+        <p class="small-text">Enter the OTP sent to your registered email</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %} {% for category, message in messages %}
+        <div class="flash-message flash-{{ category }}">{{ message }}</div>
+        {% endfor %} {% endif %} {% endwith %}
+
+        <div class="input-box">
+          <input
+            type="text"
+            name="otp"
+            placeholder="Enter 6-digit OTP"
+            required
+            maxlength="6"
+            pattern="[0-9]{6}"
+            title="Enter the 6-digit OTP"
+          />
+          <i class="bx bx-key"></i>
+        </div>
+
+        <button type="submit" class="btn">Verify</button>
+
+        <div class="register-link">
+          <p>
+            Didn’t receive OTP?
+            <a href="{{ url_for('resend_otp') }}">Resend OTP</a>
+          </p>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      // Form validation
+      document
+        .getElementById("otpForm")
+        .addEventListener("submit", function (e) {
+          if (!this.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+            const firstInvalid = this.querySelector(":invalid");
+            if (firstInvalid) firstInvalid.focus();
+          }
+          this.classList.add("was-validated");
+        });
+
+      // Real-time validation
+      document
+        .querySelector('input[name="otp"]')
+        .addEventListener("input", function () {
+          this.value = this.value.replace(/[^0-9]/g, ""); // only digits
+          if (this.checkValidity()) {
+            this.classList.remove("is-invalid");
+            this.classList.add("is-valid");
+          } else {
+            this.classList.remove("is-valid");
+            this.classList.add("is-invalid");
+          }
+        });
+    </script>
+  </body>
+</html>

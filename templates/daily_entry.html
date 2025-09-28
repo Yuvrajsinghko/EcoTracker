@@ -1,328 +1,535 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Daily Entry</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
     <style>
-        body {
-            background: url(/static/images/img.jpg) no-repeat center center/cover;
-            min-height: 100vh;
-            padding-top: 80px;
-            position: relative;
-        }
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.1);
-            z-index: -1;
-        }
-        .entry-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        .form-control:invalid { border-color: #dc3545; }
-        .form-control:valid { border-color: #198754; }
+      body {
+        background: url(/static/images/img.jpg) no-repeat center center/cover;
+        min-height: 100vh;
+        padding-top: 80px;
+        position: relative;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.1);
+        z-index: -1;
+      }
+      .entry-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 15px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
 
-        /* Navbar Glow (Reduced) */
-        .navbar { box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
-        .nav-link {
-            color: #fff !important;
-            border: 1px solid transparent;
-            border-radius: 6px;
-            padding: 6px 12px;
-            margin-left: 6px;
-            transition: all 0.3s ease-in-out;
-        }
-        .nav-link:hover {
-            color: #000 !important;
-            background: #00e0b8;
-            border-color: #00e0b8;
-            text-shadow: 0 0 2px #00e0b8;
-            box-shadow: 0 0 4px #00e0b8, 0 0 8px #00e0b8;
-            transform: scale(1.02);
-        }
-        .nav-link.text-danger:hover {
-            background: #e00050;
-            border-color: #e00050;
-            text-shadow: 0 0 2px #e00050;
-            box-shadow: 0 0 4px #e00050, 0 0 8px #e00050;
-        }
+      /* Navbar */
+      .navbar {
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+      }
+      .nav-link {
+        font-weight: 500;
+        transition: all 0.3s ease-in-out;
+      }
+      .nav-link[href*="registration_done"] {
+        color: #00e0b8 !important;
+        text-shadow: 0 0 0.5px #00e0b8;
+      }
+      .nav-link[href*="profile"] {
+        color: #00bfff !important;
+        text-shadow: 0 0 2px #00bfff;
+      }
+      .nav-link.text-danger {
+        color: #ff00ff !important;
+        text-shadow: 0 0 2px #ff00ff;
+      }
+      .nav-link:hover {
+        color: #000 !important;
+        background: rgba(0, 224, 184, 0.2);
+        border-radius: 6px;
+        text-shadow: 0 0 4px #00e0b8, 0 0 8px #00e0b8;
+        transform: scale(1.01);
+      }
+      .nav-link.text-danger:hover {
+        background: rgba(255, 0, 255, 0.15);
+        text-shadow: 0 0 1px #ff00ff;
+        box-shadow: 0 0 2px #ff00ff;
+      }
 
-        /* Neon Pulse Animation for Section Headers */
-        @keyframes neonPulse {
-            0% { text-shadow: 0 0 4px currentColor, 0 0 8px currentColor; opacity: 0.9; }
-            50% { text-shadow: 0 0 6px currentColor, 0 0 12px currentColor; opacity: 1; }
-            100% { text-shadow: 0 0 4px currentColor, 0 0 8px currentColor; opacity: 0.9; }
+      /* Hero Neon */
+      .hero-neon {
+        color: #00bfff;
+        text-shadow: 0 0 6px #00bfff, 0 0 12px #00bfff, 0 0 24px #00bfff;
+        animation: heroPulse 3s infinite ease-in-out;
+      }
+      @keyframes heroPulse {
+        0% {
+          text-shadow: 0 0 6px #00bfff, 0 0 12px #00bfff;
         }
-        .section-header {
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            padding: 10px 0;
-            margin: 25px 0 15px 0;
-            animation: neonPulse 2.5s infinite ease-in-out;
+        50% {
+          text-shadow: 0 0 12px #00bfff, 0 0 24px #00bfff, 0 0 36px #00bfff;
         }
-        .transport-header { color: #f0d806 !important; }  /* Yellow */
-        .utility-header   { color: #5bdc06 !important; }  /* Green */
-        .lifestyle-header { color: #d95fdd !important; }  /* Pink */
+        100% {
+          text-shadow: 0 0 6px #00bfff, 0 0 12px #00bfff;
+        }
+      }
 
-        /* Softer Neon Submit Button */
-        .btn-neon {
-            background: transparent;
-            color: #00e0b8;
-            font-weight: bold;
-            border: 1px solid #00e0b8;
-            border-radius: 8px;
-            text-transform: uppercase;
-            text-shadow: 0 0 2px #00e0b8;
-            box-shadow: 0 0 4px #00e0b8, 0 0 8px #00e0b8;
-            transition: all 0.3s ease-in-out;
+      /* Section Headers */
+      @keyframes neonPulse {
+        0% {
+          text-shadow: 0 0 4px currentColor, 0 0 8px currentColor;
+          opacity: 0.9;
         }
-        .btn-neon:hover {
-            background: #00e0b8;
-            color: #000;
-            box-shadow: 0 0 6px #00e0b8, 0 0 12px #00e0b8;
-            transform: scale(1.03);
+        50% {
+          text-shadow: 0 0 6px currentColor, 0 0 12px currentColor;
+          opacity: 1;
         }
+        100% {
+          text-shadow: 0 0 4px currentColor, 0 0 8px currentColor;
+          opacity: 0.9;
+        }
+      }
+      .section-header {
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 10px 0;
+        margin: 25px 0 15px 0;
+        animation: neonPulse 2.5s infinite ease-in-out;
+      }
+      .transport-header {
+        color: #f0d806 !important;
+      }
+      .utility-header {
+        color: #5bdc06 !important;
+      }
+      .lifestyle-header {
+        color: #d95fdd !important;
+      }
 
-        /* Neon Glow on Hover ONLY */
-        .form-control, 
-        .form-select {
-            transition: all 0.3s ease-in-out;
-        }
-        /* Work & Commute → Yellow */
-        .transport-header ~ .row .form-control:hover,
-        .transport-header ~ .row .form-select:hover {
-            border-color: #f0d806;
-            box-shadow: 0 0 4px #f0d806, 0 0 8px #f0d806;
-        }
-        /* Food & Resources → Green */
-        .utility-header ~ .row .form-control:hover,
-        .utility-header ~ .row .form-select:hover {
-            border-color: #5bdc06;
-            box-shadow: 0 0 4px #5bdc06, 0 0 8px #5bdc06;
-        }
-        /* Digital Impact → Pink */
-        .lifestyle-header ~ .row .form-control:hover,
-        .lifestyle-header ~ .row .form-select:hover {
-            border-color: #d95fdd;
-            box-shadow: 0 0 4px #d95fdd, 0 0 8px #d95fdd;
-        }
+      /* Softer Submit Button */
+      .btn-neon {
+        background: transparent;
+        color: #66f0d4;
+        font-weight: bold;
+        border: 1px solid #66f0d4;
+        border-radius: 8px;
+        text-transform: uppercase;
+        text-shadow: 0 0 1px #66f0d4;
+        box-shadow: 0 0 2px #66f0d4, 0 0 4px #66f0d4;
+        transition: all 0.3s ease-in-out;
+      }
+      .btn-neon:hover {
+        background: rgba(102, 240, 212, 0.15);
+        color: #66f0d4;
+        box-shadow: 0 0 4px #66f0d4, 0 0 8px #66f0d4;
+        transform: scale(1.02);
+      }
 
-        /* Dropdown menu subtle glow */
-        .form-select option:checked {
-            background: #111;
-            color: #fff;
-            text-shadow: 0 0 3px currentColor;
-        }
+      /* Inputs glow only on hover */
+      .form-control,
+      .form-select {
+        transition: all 0.3s ease-in-out;
+      }
+      .transport-header ~ .row .form-control:hover,
+      .transport-header ~ .row .form-select:hover {
+        border-color: #f0d806;
+        box-shadow: 0 0 3px #f0d806;
+      }
+      .utility-header ~ .row .form-control:hover,
+      .utility-header ~ .row .form-select:hover {
+        border-color: #5bdc06;
+        box-shadow: 0 0 3px #5bdc06;
+      }
+      .lifestyle-header ~ .row .form-control:hover,
+      .lifestyle-header ~ .row .form-select:hover {
+        border-color: #d95fdd;
+        box-shadow: 0 0 3px #d95fdd;
+      }
 
-        /* Placeholder styling */
-        .form-control::placeholder { color: rgba(255, 255, 255, 0.6); }
+      /* Toasts */
+      .toast-success {
+        background: rgba(0, 255, 128, 0.08);
+        color: #00e0b8;
+        border: 1px solid rgba(0, 224, 184, 0.5);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        text-shadow: 0 0 1px #00e0b8;
+        box-shadow: 0 0 6px rgba(0, 224, 184, 0.6);
+      }
 
-        /* Neon Toast Styles */
-        .toast-success {
-            background: rgba(0, 255, 128, 0.1);
-            color: #00e0b8;
-            border: 1px solid #00e0b8;
-            text-shadow: 0 0 3px #00e0b8;
-            box-shadow: 0 0 6px #00e0b8;
-            font-weight: bold;
-        }
-        .toast-danger {
-            background: rgba(255, 0, 100, 0.1);
-            color: #e00050;
-            border: 1px solid #e00050;
-            text-shadow: 0 0 3px #e00050;
-            box-shadow: 0 0 6px #e00050;
-            font-weight: bold;
-        }
-        .btn-close { filter: brightness(0) invert(1); }
-        .toast-container {
-            position: fixed;
-            top: 90px;
-            right: 20px;
-            z-index: 2000;
-        }
+      .toast-danger {
+        background: rgba(255, 0, 100, 0.08);
+        color: #ff4d88;
+        border: 1px solid rgba(255, 77, 136, 0.5);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        text-shadow: 0 0 1px #ff4d88;
+        box-shadow: 0 0 6px rgba(255, 77, 136, 0.6);
+      }
+
+      .toast-container {
+        position: fixed;
+        top: 90px;
+        right: 20px;
+        z-index: 2000;
+      }
+      /* Toast entry/exit animation */
+      .toast {
+        opacity: 0;
+        transform: translateX(120%);
+        transition: all 0.6s ease-in-out;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      .toast.hide {
+        opacity: 0;
+        transform: translateX(120%);
+      }
+
+      .btn-close {
+        filter: brightness(0) invert(1);
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="{{ url_for('registration_done') }}">Carbon Tracker</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('registration_done') }}">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('profile') }}">Profile</a></li>
-                    <li class="nav-item"><a class="nav-link text-danger" href="{{ url_for('logout') }}">Logout</a></li>
-                </ul>
-            </div>
+      <div class="container-fluid">
+        <a
+          class="navbar-brand fw-bold hero-neon"
+          href="{{ url_for('registration_done') }}"
+          >Carbon Tracker</a
+        >
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('registration_done') }}"
+                >Home</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('user_insights') }}"
+                >Insights</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('simple_report') }}"
+                >Monthly Report</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('user_leaderboard') }}">
+                <i class="fas fa-trophy me-1"></i>Leaderboard
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('profile') }}">Profile</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-danger" href="{{ url_for('logout') }}"
+                >Logout</a
+              >
+            </li>
+          </ul>
         </div>
+      </div>
     </nav>
 
     <!-- Toasts -->
     <div class="toast-container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                <div class="toast align-items-center mb-2 
-                            {% if category == 'success' %}toast-success{% elif category == 'danger' %}toast-danger{% endif %}" 
-                     role="alert" aria-live="assertive" aria-atomic="true">
-                    <div class="d-flex">
-                        <div class="toast-body">{{ message }}</div>
-                        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast"></button>
-                    </div>
-                </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for category, message in messages %}
+      <div
+        class="toast align-items-center mb-2 {% if category == 'success' %}toast-success{% elif category == 'danger' %}toast-danger{% endif %}"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        <div class="d-flex">
+          <div class="toast-body">{{ message }}</div>
+          <button
+            type="button"
+            class="btn-close me-2 m-auto"
+            data-bs-dismiss="toast"
+          ></button>
+        </div>
+      </div>
+      {% endfor %} {% endif %} {% endwith %}
+
+      <!-- Hidden template for validation errors -->
+      <div
+        id="errorToastTemplate"
+        class="toast align-items-center mb-2 toast-danger d-none"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        <div class="d-flex">
+          <div class="toast-body"></div>
+          <button
+            type="button"
+            class="btn-close me-2 m-auto"
+            data-bs-dismiss="toast"
+          ></button>
+        </div>
+      </div>
     </div>
 
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="entry-card p-4">
-                    <h2 class="text-center mb-4">Daily Carbon Footprint Entry</h2>
-                    
-                    <form action="/dailyentrypage" method="POST" id="dailyForm" novalidate>
-                        
-                        <!-- Work & Commute -->
-                        <h5 class="transport-header section-header">Work & Commute</h5>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Work Location <span class="text-danger">*</span></label>
-                                <select class="form-select" name="work_location" required>
-                                    <option value="" selected disabled>Select</option>
-                                    <option value="Office">Office</option>
-                                    <option value="Home">Work From Home</option>
-                                    <option value="Travel">Business Travel</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Commute Mode <span class="text-danger">*</span></label>
-                                <select class="form-select" name="commute_mode" required>
-                                    <option value="" selected disabled>Select</option>
-                                    <option value="Car">Car</option>
-                                    <option value="Bike">Bike</option>
-                                    <option value="Public-Transport">Public Transport</option>
-                                    <option value="Walk">Walk</option>
-                                    <option value="Cycle">Cycle</option>
-                                    <option value="Flight">Flight</option>
-                                    <option value="None">None</option>
-                                </select>
-                            </div>
-                            <div class="col-md-12 mb-3">
-                                <label class="form-label">Distance Travelled (km)</label>
-                                <input type="number" class="form-control" name="commute_distance"
-                                       placeholder="Enter total km" min="0" max="20000" step="1">
-                            </div>
-                        </div>
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="entry-card p-4">
+            <h2 class="text-center mb-4 hero-neon">
+              Daily Carbon Footprint Entry
+            </h2>
 
-                        <!-- Food & Resources -->
-                        <h5 class="utility-header section-header">Food & Resources</h5>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Primary Meal Source <span class="text-danger">*</span></label>
-                                <select class="form-select" name="meal_source" required>
-                                    <option value="" selected disabled>Select Source</option>
-                                    <option value="Home-Packed">Brought from Home</option>
-                                    <option value="Office-Cafeteria">Office Cafeteria</option>
-                                    <option value="Local-Restaurant">Local Restaurant</option>
-                                    <option value="Food-Delivery">Food Delivery</option>
-                                    <option value="Client-Catered">Client/Meeting Catered</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Diet Type <span class="text-danger">*</span></label>
-                                <select class="form-select" name="diet" required>
-                                    <option value="" selected disabled>Select Diet</option>
-                                    <option value="Vegetarian">Vegetarian</option>
-                                    <option value="Vegan">Vegan</option>
-                                    <option value="Non-Vegetarian">Non-Vegetarian</option>
-                                    <option value="Pescatarian">Pescatarian</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Digital Impact -->
-                        <h5 class="lifestyle-header section-header">Digital Impact</h5>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Digital Footprint Today</label>
-                                <select class="form-select" name="digital_intensity" required>
-                                    <option value="Light">Light (Email, basic tasks)</option>
-                                    <option value="Moderate" selected>Moderate (Normal office work)</option>
-                                    <option value="Heavy">Heavy (Video calls, large files)</option>
-                                    <option value="Intensive">Intensive (Streaming, presentations)</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Printing Today</label>
-                                <select class="form-select" name="printing_level" required>
-                                    <option value="None" selected>No Printing</option>
-                                    <option value="Minimal">Minimal (1-5 pages)</option>
-                                    <option value="Moderate">Moderate (6-20 pages)</option>
-                                    <option value="Heavy">Heavy (20+ pages)</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Submit -->
-                        <div class="d-grid mt-4">
-                            <button type="submit" class="btn btn-neon btn-lg">Submit Daily Entry</button>
-                        </div>
-                        
-                        <div class="text-center mt-3">
-                            <small class="text-muted">
-                                <span class="text-danger">*</span> Required fields
-                            </small>
-                        </div>
-                    </form>
+            <!-- Form -->
+            <form
+              action="/dailyentrypage"
+              method="POST"
+              id="dailyForm"
+              novalidate
+            >
+              <!-- Work & Commute -->
+              <h5 class="transport-header section-header">Work & Commute</h5>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label"
+                    >Work Location <span class="text-danger">*</span></label
+                  >
+                  <select class="form-select" name="work_location" required>
+                    <option value="" selected disabled>Select</option>
+                    <option value="Office">Office</option>
+                    <option value="Home">Work From Home</option>
+                    <option value="Travel">Business Travel</option>
+                    <option value="Other">Other</option>
+                  </select>
+                  <div class="invalid-feedback">
+                    Please select your work location.
+                  </div>
                 </div>
-            </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label"
+                    >Commute Mode <span class="text-danger">*</span></label
+                  >
+                  <select class="form-select" name="commute_mode" required>
+                    <option value="" selected disabled>Select</option>
+                    <option value="Car">Car</option>
+                    <option value="Bike">Bike</option>
+                    <option value="Public-Transport">Public Transport</option>
+                    <option value="Walk">Walk</option>
+                    <option value="Cycle">Cycle</option>
+                    <option value="Flight">Flight</option>
+                    <option value="None">None</option>
+                  </select>
+                  <div class="invalid-feedback">
+                    Please choose a valid commute mode.
+                  </div>
+                </div>
+                <div class="col-md-12 mb-3">
+                  <label class="form-label">Distance Travelled (km)</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    name="commute_distance"
+                    placeholder="Enter total km"
+                    min="0"
+                    max="1000"
+                    step="any"
+                    required
+                  />
+                  <div class="invalid-feedback">
+                    Enter a distance between 0 and 1000 km.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Food & Resources -->
+              <h5 class="utility-header section-header">Food & Resources</h5>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label"
+                    >Primary Meal Source
+                    <span class="text-danger">*</span></label
+                  >
+                  <select class="form-select" name="meal_source" required>
+                    <option value="" selected disabled>Select Source</option>
+                    <option value="Home-Packed">Brought from Home</option>
+                    <option value="Office-Cafeteria">Office Cafeteria</option>
+                    <option value="Local-Restaurant">Local Restaurant</option>
+                    <option value="Food-Delivery">Food Delivery</option>
+                    <option value="Client-Catered">
+                      Client/Meeting Catered
+                    </option>
+                  </select>
+                  <div class="invalid-feedback">
+                    Please select your meal source.
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label"
+                    >Diet Type <span class="text-danger">*</span></label
+                  >
+                  <select class="form-select" name="diet" required>
+                    <option value="" selected disabled>Select Diet</option>
+                    <option value="Vegetarian">Vegetarian</option>
+                    <option value="Vegan">Vegan</option>
+                    <option value="Non-Vegetarian">Non-Vegetarian</option>
+                    <option value="Pescatarian">Pescatarian</option>
+                  </select>
+                  <div class="invalid-feedback">
+                    Please choose your diet type.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Digital Impact -->
+              <h5 class="lifestyle-header section-header">Digital Impact</h5>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Digital Footprint Today</label>
+                  <select class="form-select" name="digital_intensity" required>
+                    <option value="" selected disabled>Select</option>
+                    <option value="Light">Light (Email, basic tasks)</option>
+                    <option value="Moderate">
+                      Moderate (Normal office work)
+                    </option>
+                    <option value="Heavy">
+                      Heavy (Video calls, large files)
+                    </option>
+                    <option value="Intensive">
+                      Intensive (Streaming, presentations)
+                    </option>
+                  </select>
+                  <div class="invalid-feedback">
+                    Please select your digital usage level.
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Printing Today</label>
+                  <select class="form-select" name="printing_level" required>
+                    <option value="" selected disabled>Select</option>
+                    <option value="None">No Printing</option>
+                    <option value="Minimal">Minimal (1-5 pages)</option>
+                    <option value="Moderate">Moderate (6-20 pages)</option>
+                    <option value="Heavy">Heavy (20+ pages)</option>
+                  </select>
+                  <div class="invalid-feedback">
+                    Please select your printing level.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Submit -->
+              <div class="d-grid mt-4">
+                <button type="submit" class="btn btn-neon btn-lg">
+                  Submit Daily Entry
+                </button>
+              </div>
+              <div class="text-center mt-3">
+                <small class="text-muted"
+                  ><span class="text-danger">*</span> Required fields</small
+                >
+              </div>
+            </form>
+          </div>
         </div>
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Form validation
-        document.getElementById('dailyForm').addEventListener('submit', function(e) {
-            const form = this;
-            if (!form.checkValidity()) {
-                e.preventDefault();
-                e.stopPropagation();
-                const firstInvalid = form.querySelector(':invalid');
-                if (firstInvalid) {
-                    firstInvalid.focus();
-                    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
+      document
+        .getElementById("dailyForm")
+        .addEventListener("submit", function (e) {
+          const form = this;
+
+          if (!form.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const firstInvalid = form.querySelector(":invalid");
+            if (firstInvalid) {
+              firstInvalid.focus();
+              firstInvalid.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+              });
+              showErrorToast(firstInvalid);
             }
-            form.classList.add('was-validated');
+          }
+
+          form.classList.add("was-validated");
         });
 
-        // Auto-show Bootstrap toasts
-        document.addEventListener("DOMContentLoaded", function() {
-            const toastElList = [].slice.call(document.querySelectorAll('.toast'))
-            toastElList.map(function (toastEl) {
-                const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
-                toast.show();
-            });
-        });
+      // Function to trigger error toast
+      function showErrorToast(field) {
+        const toastContainer = document.querySelector(".toast-container");
+        const template = document.getElementById("errorToastTemplate");
+
+        const newToast = template.cloneNode(true);
+        newToast.classList.remove("d-none");
+        newToast.removeAttribute("id");
+
+        let message =
+          field.parentElement.querySelector(".invalid-feedback")?.textContent ||
+          "Please fill this field correctly.";
+        newToast.querySelector(".toast-body").textContent = message;
+
+        toastContainer.appendChild(newToast);
+        new bootstrap.Toast(newToast, { delay: 4000 }).show();
+
+        newToast.addEventListener("hidden.bs.toast", () => newToast.remove());
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const toastElList = [].slice.call(document.querySelectorAll(".toast"));
+        toastElList.map((toastEl) =>
+          new bootstrap.Toast(toastEl, { delay: 4000 }).show()
+        );
+      });
+      // Auto-logout after inactivity (client-side only)
+      let inactivityLimit = 5 * 60 * 1000; // 5 minutes
+      let inactivityTimer;
+
+      function resetTimer() {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(() => {
+          window.location.href = "{{ url_for('logout') }}"; // Force logout
+        }, inactivityLimit);
+      }
+
+      // Reset timer when user interacts
+      ["mousemove", "keydown", "click", "scroll"].forEach((event) => {
+        window.addEventListener(event, resetTimer);
+      });
+
+      // Start timer
+      resetTimer();
     </script>
-</body>
+  </body>
 </html>

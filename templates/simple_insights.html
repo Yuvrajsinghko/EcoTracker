@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Insights</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background: url(/static/images/img.jpg) no-repeat center center/cover;
+        min-height: 100vh;
+        padding-top: 80px;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.1);
+        z-index: -1;
+      }
+
+      .card-glass {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border-radius: 15px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        margin-bottom: 20px;
+      }
+
+      .hero-text {
+        color: #00bfff;
+        text-shadow: 0 0 6px #00bfff, 0 0 12px #00bfff, 0 0 24px #00bfff;
+        animation: heroPulse 3s infinite ease-in-out;
+      }
+      @keyframes heroPulse {
+        0% {
+          text-shadow: 0 0 6px #00bfff, 0 0 12px #00bfff;
+        }
+        50% {
+          text-shadow: 0 0 12px #00bfff, 0 0 24px #00bfff, 0 0 36px #00bfff;
+        }
+        100% {
+          text-shadow: 0 0 6px #00bfff, 0 0 12px #00bfff;
+        }
+      }
+
+      .stat-box {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #00e0b8;
+        text-shadow: 0 0 5px #00e0b8;
+      }
+
+      .stat-label {
+        color: white;
+        margin-top: 5px;
+      }
+
+      .tip-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+        color: white;
+      }
+
+      .tip-icon {
+        font-size: 1.5rem;
+        margin-right: 10px;
+      }
+
+      .tip-category {
+        color: #00e0b8;
+        font-weight: bold;
+        font-size: 0.8rem;
+        margin-bottom: 5px;
+      }
+
+      /* Navbar */
+      .navbar {
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+      }
+      .nav-link {
+        font-weight: 500;
+        transition: all 0.3s ease-in-out;
+      }
+      .nav-link[href*="registration_done"] {
+        color: #00e0b8 !important;
+        text-shadow: 0 0 0.5px #00e0b8;
+      }
+      .nav-link[href*="profile"] {
+        color: #00bfff !important;
+        text-shadow: 0 0 2px #00bfff;
+      }
+      .nav-link.text-danger {
+        color: #ff00ff !important;
+        text-shadow: 0 0 2px #ff00ff;
+      }
+      .nav-link:hover {
+        color: #000 !important;
+        background: rgba(0, 224, 184, 0.2);
+        border-radius: 6px;
+        text-shadow: 0 0 4px #00e0b8, 0 0 8px #00e0b8;
+        transform: scale(1.01);
+      }
+      .nav-link.text-danger:hover {
+        background: rgba(255, 0, 255, 0.15);
+        text-shadow: 0 0 1px #ff00ff;
+        box-shadow: 0 0 2px #ff00ff;
+      }
+
+      .no-data {
+        text-align: center;
+        padding: 40px;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container-fluid">
+        <a
+          class="navbar-brand fw-bold hero-text"
+          href="{{ url_for('registration_done') }}"
+          >Carbon Tracker</a
+        >
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('registration_done') }}"
+                >Home</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('daily_user_entry') }}"
+                >Daily Entry</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('entries_overview') }}"
+                >My Entries</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('simple_report') }}"
+                >Monthly Report</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('user_leaderboard') }}">
+                <i class="fas fa-trophy me-1"></i>Leaderboard
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('profile') }}">Profile</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-danger" href="{{ url_for('logout') }}"
+                >Logout</a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          {% if stats %}
+          <!-- Stats Overview -->
+          <div class="card-glass p-4">
+            <h2 class="text-center mb-4 hero-text">Your Carbon Insights</h2>
+
+            <div class="row">
+              <div class="col-md-3">
+                <div class="stat-box">
+                  <div class="stat-number">{{ stats.total_entries }}</div>
+                  <div class="stat-label">Days Tracked</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="stat-box">
+                  <div class="stat-number">{{ stats.avg_carbon }}</div>
+                  <div class="stat-label">Avg CO₂ (kg/day)</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="stat-box">
+                  <div class="stat-number">{{ stats.total_points }}</div>
+                  <div class="stat-label">Green Points</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="stat-box">
+                  <div class="stat-number">{{ stats.total_distance }}</div>
+                  <div class="stat-label">Total km</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Best/Worst Days -->
+            <div class="row mt-3">
+              <div class="col-md-6">
+                <div class="stat-box">
+                  <div class="stat-number" style="color: #2ed573">
+                    {{ stats.best_day }}
+                  </div>
+                  <div class="stat-label">Best Day (kg CO₂)</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="stat-box">
+                  <div class="stat-number" style="color: #ff4757">
+                    {{ stats.worst_day }}
+                  </div>
+                  <div class="stat-label">Worst Day (kg CO₂)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tips Section -->
+          <div class="card-glass p-4">
+            <h4 class="hero-text mb-3">Recommendations</h4>
+            {% for tip in tips %}
+            <div class="tip-card">
+              <div class="tip-category">{{ tip.category }}</div>
+              <div>
+                <span class="tip-icon">{{ tip.icon }}</span>
+                {{ tip.message }}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+
+          {% else %}
+          <!-- No Data -->
+          <div class="card-glass p-4">
+            <div class="no-data">
+              <h4>No Data Available</h4>
+              <p>Start tracking your daily carbon footprint to see insights.</p>
+              <a
+                href="{{ url_for('daily_user_entry') }}"
+                class="btn btn-outline-light"
+                >Add Entry</a
+              >
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

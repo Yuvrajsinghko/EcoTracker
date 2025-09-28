@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monthly Report</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background: url(/static/images/img.jpg) no-repeat center center/cover;
+        min-height: 100vh;
+        padding-top: 80px;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.1);
+        z-index: -1;
+      }
+
+      .card-glass {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border-radius: 15px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        margin-bottom: 20px;
+      }
+
+      .hero-text {
+        color: #00bfff;
+        text-shadow: 0 0 6px #00bfff, 0 0 12px #00bfff, 0 0 24px #00bfff;
+        animation: heroPulse 3s infinite ease-in-out;
+      }
+      @keyframes heroPulse {
+        0% {
+          text-shadow: 0 0 6px #00bfff, 0 0 12px #00bfff;
+        }
+        50% {
+          text-shadow: 0 0 12px #00bfff, 0 0 24px #00bfff, 0 0 36px #00bfff;
+        }
+        100% {
+          text-shadow: 0 0 6px #00bfff, 0 0 12px #00bfff;
+        }
+      }
+
+      .metric-card {
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .metric-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      .metric-label {
+        color: white;
+        font-size: 0.9rem;
+      }
+
+      .carbon-value {
+        color: #ff6b6b;
+        text-shadow: 0 0 4px #ff6b6b;
+      }
+      .points-value {
+        color: #00e0b8;
+        text-shadow: 0 0 4px #00e0b8;
+      }
+      .rank-value {
+        color: #ffd93d;
+        text-shadow: 0 0 4px #ffd93d;
+      }
+      .entries-value {
+        color: #74b9ff;
+        text-shadow: 0 0 4px #74b9ff;
+      }
+
+      .performance-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      .performance-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+      }
+
+      .performance-item:last-child {
+        border-bottom: none;
+      }
+
+      .score-good {
+        color: #2ed573;
+        font-weight: bold;
+      }
+      .score-average {
+        color: #ffa502;
+        font-weight: bold;
+      }
+      .score-poor {
+        color: #ff4757;
+        font-weight: bold;
+      }
+
+      /* Navbar */
+      .navbar {
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+      }
+      .nav-link {
+        font-weight: 500;
+        transition: all 0.3s ease-in-out;
+      }
+      .nav-link[href*="registration_done"] {
+        color: #00e0b8 !important;
+        text-shadow: 0 0 0.5px #00e0b8;
+      }
+      .nav-link[href*="profile"] {
+        color: #00bfff !important;
+        text-shadow: 0 0 2px #00bfff;
+      }
+      .nav-link.text-danger {
+        color: #ff00ff !important;
+        text-shadow: 0 0 2px #ff00ff;
+      }
+      .nav-link:hover {
+        color: #000 !important;
+        background: rgba(0, 224, 184, 0.2);
+        border-radius: 6px;
+        text-shadow: 0 0 4px #00e0b8, 0 0 8px #00e0b8;
+        transform: scale(1.01);
+      }
+      .nav-link.text-danger:hover {
+        background: rgba(255, 0, 255, 0.15);
+        text-shadow: 0 0 1px #ff00ff;
+        box-shadow: 0 0 2px #ff00ff;
+      }
+
+      .no-data {
+        text-align: center;
+        padding: 40px;
+        color: white;
+      }
+
+      .summary-box {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        padding: 15px;
+        margin: 10px 0;
+        color: white;
+      }
+
+      .print-btn {
+        background: transparent;
+        border: 1px solid #00e0b8;
+        color: #00e0b8;
+        padding: 8px 20px;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+      }
+
+      .print-btn:hover {
+        background: rgba(0, 224, 184, 0.1);
+        color: #00e0b8;
+      }
+
+      @media print {
+        body {
+          background: white !important;
+        }
+        .navbar {
+          display: none;
+        }
+        .card-glass {
+          background: white !important;
+          box-shadow: none !important;
+          border: 1px solid #ddd !important;
+        }
+        .print-btn {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container-fluid">
+        <a
+          class="navbar-brand fw-bold hero-text"
+          href="{{ url_for('registration_done') }}"
+          >Carbon Tracker</a
+        >
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('registration_done') }}"
+                >Home</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('daily_user_entry') }}"
+                >Daily Entry</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('entries_overview') }}"
+                >My Entries</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('user_insights') }}"
+                >Insights</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('user_leaderboard') }}">
+                <i class="fas fa-trophy me-1"></i>Leaderboard
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('profile') }}">Profile</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-danger" href="{{ url_for('logout') }}"
+                >Logout</a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          {% if stats %}
+          <div class="card-glass p-4">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h2 class="hero-text mb-0">30-Day Report</h2>
+              <button class="print-btn" onclick="window.print()">
+                Print Report
+              </button>
+            </div>
+
+            <!-- Main Metrics -->
+            <div class="row">
+              <div class="col-md-3">
+                <div class="metric-card">
+                  <div class="metric-value carbon-value">
+                    {{ stats.total_carbon }}
+                  </div>
+                  <div class="metric-label">Total CO₂ (kg)</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="metric-card">
+                  <div class="metric-value points-value">
+                    {{ stats.total_points }}
+                  </div>
+                  <div class="metric-label">Green Points</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="metric-card">
+                  <div class="metric-value rank-value">#{{ stats.rank }}</div>
+                  <div class="metric-label">Your Rank</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="metric-card">
+                  <div class="metric-value entries-value">
+                    {{ stats.total_entries }}
+                  </div>
+                  <div class="metric-label">Days Tracked</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Performance Summary -->
+            <div class="row">
+              <div class="col-md-6">
+                <div class="performance-card">
+                  <h5 class="text-white mb-3">Performance Overview</h5>
+                  <div class="performance-item">
+                    <span>Daily Average:</span>
+                    <span
+                      class="{% if stats.avg_carbon <= 15 %}score-good{% elif stats.avg_carbon <= 25 %}score-average{% else %}score-poor{% endif %}"
+                    >
+                      {{ stats.avg_carbon }} kg CO₂
+                    </span>
+                  </div>
+                  <div class="performance-item">
+                    <span>Best Day:</span>
+                    <span class="score-good">{{ stats.best_day }} kg CO₂</span>
+                  </div>
+                  <div class="performance-item">
+                    <span>Worst Day:</span>
+                    <span class="score-poor">{{ stats.worst_day }} kg CO₂</span>
+                  </div>
+                  <div class="performance-item">
+                    <span>Total Distance:</span>
+                    <span class="text-white"
+                      >{{ stats.total_distance }} km</span
+                    >
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="performance-card">
+                  <h5 class="text-white mb-3">Your Impact</h5>
+                  <div class="summary-box">
+                    {% if stats.avg_carbon <= 15 %}
+                    <h6 class="score-good">Excellent Performance!</h6>
+                    <p class="mb-0">
+                      Your carbon footprint is well below average. Keep up the
+                      great work!
+                    </p>
+                    {% elif stats.avg_carbon <= 25 %}
+                    <h6 class="score-average">Good Progress!</h6>
+                    <p class="mb-0">
+                      You're doing well. Consider reducing high-impact
+                      activities for even better results.
+                    </p>
+                    {% else %}
+                    <h6 class="score-poor">Room for Improvement</h6>
+                    <p class="mb-0">
+                      Focus on transport and diet choices to reduce your carbon
+                      footprint.
+                    </p>
+                    {% endif %}
+                  </div>
+
+                  <div class="mt-3">
+                    <small class="text-muted">
+                      Rank {{ stats.rank }} among all users this month. {% if
+                      stats.rank <= 10 %} You're in the top performers! {% elif
+                      stats.rank <= 25 %} Above average performance. {% else %}
+                      Keep tracking to improve your ranking. {% endif %}
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Simple Achievements -->
+            {% if stats.total_entries >= 20 or stats.avg_carbon <= 15 or
+            stats.rank <= 10 %}
+            <div class="performance-card">
+              <h5 class="text-white mb-3">Achievements</h5>
+              <div class="row text-center">
+                {% if stats.total_entries >= 20 %}
+                <div class="col-md-4 mb-2">
+                  <div class="summary-box">
+                    <h6 class="score-good">📅 Consistent Tracker</h6>
+                    <small>Tracked {{ stats.total_entries }} days</small>
+                  </div>
+                </div>
+                {% endif %} {% if stats.avg_carbon <= 15 %}
+                <div class="col-md-4 mb-2">
+                  <div class="summary-box">
+                    <h6 class="score-good">🌱 Eco Warrior</h6>
+                    <small>Low carbon footprint</small>
+                  </div>
+                </div>
+                {% endif %} {% if stats.rank <= 10 %}
+                <div class="col-md-4 mb-2">
+                  <div class="summary-box">
+                    <h6 class="score-good">🏆 Top Performer</h6>
+                    <small>Rank #{{ stats.rank }}</small>
+                  </div>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+            {% endif %}
+
+            <!-- Recent Entries Preview -->
+            <div class="performance-card">
+              <h5 class="text-white mb-3">Recent Activity</h5>
+              {% for entry in stats.entries[:5] %}
+              <div class="performance-item">
+                <span>{{ entry.date_of_entry.strftime('%m/%d') }}</span>
+                <span>{{ entry.mode_of_transport }}</span>
+                <span
+                  class="{% if entry.carbon_score <= 15 %}score-good{% elif entry.carbon_score <= 25 %}score-average{% else %}score-poor{% endif %}"
+                >
+                  {{ entry.carbon_score }} kg CO₂
+                </span>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          {% else %}
+          <!-- No Data -->
+          <div class="card-glass p-4">
+            <div class="no-data">
+              <h4>No Report Data</h4>
+              <p>You need some daily entries to generate your report.</p>
+              <a
+                href="{{ url_for('daily_user_entry') }}"
+                class="btn btn-outline-light"
+                >Start Tracking</a
+              >
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
