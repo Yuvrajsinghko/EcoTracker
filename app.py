@@ -983,17 +983,9 @@ def delete_user_profile():
 
     except Exception as e:
         db.rollback()
-<<<<<<< HEAD
-        flash("Error deleting profile","error")
-        return redirect(url_for('profile'))
-    
-    
-=======
-        flash("Error deleteing profile", "error")
+        flash("Error deleting profile", "error")
         return redirect(url_for("profile"))
 
-
->>>>>>> 542d1bc1d07cba509165389349cec83596af81ce
 @app.route("/logout")
 def logout():
     user_id = session.get("user_id")
