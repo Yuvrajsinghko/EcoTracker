@@ -205,16 +205,16 @@ def register():
     u_sername = request.form.get("username")
     confirm_password = request.form.get("confirmPassword")
 
-    
-
     errors = []
 
-    if not all([name, email, user_phone_no, age, gender, password, u_sername, confirm_password]):
+    if not all(
+        [name, email, user_phone_no, age, gender, password, u_sername, confirm_password]
+    ):
         errors.append("All fields are required.")
         for error in errors:
             flash(error, "danger")
         return render_template("Signup.html")
-    
+
     hashed_password = generate_password_hash(
         password, method="pbkdf2:sha256", salt_length=16
     )
@@ -223,14 +223,12 @@ def register():
         "SELECT username email FROM SignupDetails WHERE username = %s ", (u_sername,)
     )
     user_name = cursor.fetchone()
-    
-    
-    
+
     print(user_name)
     if user_name:
         flash("Username already exist", "danger")
         return redirect(url_for("signup"))
-    
+
     else:
         if not (4 <= len(name) <= 16):
             errors.append("Name must be 4-16 characters long.")
@@ -465,6 +463,182 @@ def daily_user_entry():
         )
 
 
+# Add these simplified functions to your app.py file
+
+
+def get_user_stats(user_id, days=30):
+    """Get basic user statistics for the last N days"""
+    cursor = db.cursor()
+    cursor.execute(
+        """
+        SELECT d.carbon_score, d.date_of_entry,
+               t.mode_of_transport, t.distance_travelled, t.work_location,
+               di.diet_type, e.points_earned
+        FROM DailyEntry d 
+        JOIN TransportDetails t ON d.transport_ref_id = t.transport_id 
+        JOIN DietDetails di ON d.diet_ref_id = di.diet_id 
+        JOIN EmployeePoints e ON d.user_point_id_ref = e.emp_point_id
+        WHERE d.signup_ref_id = %s 
+        AND d.date_of_entry >= DATE_SUB(CURDATE(), INTERVAL %s DAY)
+        ORDER BY d.date_of_entry DESC
+    """,
+        (user_id, days),
+    )
+
+    entries = cursor.fetchall()
+    cursor.close()
+
+    if not entries:
+        return None
+
+    # Basic calculations
+    carbon_scores = [entry["carbon_score"] for entry in entries]
+    total_distance = sum(entry["distance_travelled"] or 0 for entry in entries)
+
+    stats = {
+        "total_entries": len(entries),
+        "avg_carbon": round(sum(carbon_scores) / len(carbon_scores), 1),
+        "total_carbon": round(sum(carbon_scores), 1),
+        "total_points": sum(entry["points_earned"] for entry in entries),
+        "total_distance": round(total_distance, 1),
+        "best_day": min(carbon_scores),
+        "worst_day": max(carbon_scores),
+        "entries": entries,
+    }
+
+    return stats
+
+
+def get_simple_tips(stats):
+    """Generate basic tips based on user stats"""
+    if not stats:
+        return ["Start tracking your daily activities to get tips!"]
+
+    tips = []
+
+    # High carbon footprint
+    if stats["avg_carbon"] > 25:
+        tips.append(
+            {
+                "icon": "⚠️",
+                "message": "Your carbon footprint is high. Try using public transport or working from home more often.",
+                "category": "Reduce Emissions",
+            }
+        )
+
+    # Good performance
+    elif stats["avg_carbon"] < 15:
+        tips.append(
+            {
+                "icon": "🌟",
+                "message": "Great job! Your carbon footprint is low. Keep up the good work.",
+                "category": "Keep Going",
+            }
+        )
+
+    # High travel distance
+    if (
+        stats["total_distance"] > stats["total_entries"] * 15
+    ):  # More than 15km/day average
+        tips.append(
+            {
+                "icon": "🚗",
+                "message": "You travel long distances daily. Consider carpooling or remote work options.",
+                "category": "Transport",
+            }
+        )
+
+    # Consistency encouragement
+    if stats["total_entries"] < 20:
+        tips.append(
+            {
+                "icon": "📅",
+                "message": "Track more days to get better insights and improve your environmental impact.",
+                "category": "Tracking",
+            }
+        )
+
+    # General tip
+    tips.append(
+        {
+            "icon": "🌱",
+            "message": "Small daily changes add up. Try one eco-friendly habit this week.",
+            "category": "General",
+        }
+    )
+
+    return tips[:4]  # Return max 4 tips
+
+
+@app.route("/insights")
+def user_insights():
+    """Simple insights page"""
+    username = session.get("username", None)
+    if not username:
+        return redirect(url_for("login"))
+
+    cursor = db.cursor()
+    cursor.execute("SELECT id FROM SignupDetails WHERE username = %s", (username,))
+    user_result = cursor.fetchone()
+    cursor.close()
+
+    if not user_result:
+        return redirect(url_for("login"))
+
+    user_id = user_result["id"]
+    stats = get_user_stats(user_id)
+    tips = get_simple_tips(stats)
+
+    return render_template(
+        "simple_insights.html", stats=stats, tips=tips, username=username
+    )
+
+
+@app.route("/simple_report")
+def simple_report():
+    """Basic monthly report"""
+    username = session.get("username", None)
+    if not username:
+        return redirect(url_for("login"))
+
+    cursor = db.cursor()
+    cursor.execute("SELECT id FROM SignupDetails WHERE username = %s", (username,))
+    user_result = cursor.fetchone()
+    cursor.close()
+
+    if not user_result:
+        return redirect(url_for("login"))
+
+    user_id = user_result["id"]
+    stats = get_user_stats(user_id, days=30)
+
+    # Get user ranking
+    cursor = db.cursor()
+    cursor.execute(
+        """
+        SELECT COUNT(*) + 1 as rank
+        FROM (
+            SELECT SUM(emp.points_earned) as total_points
+            FROM DailyEntry de 
+            JOIN EmployeePoints emp ON de.user_point_id_ref = emp.emp_point_id
+            WHERE de.date_of_entry >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+            GROUP BY de.signup_ref_id
+            HAVING total_points > %s
+        ) as better_users
+    """,
+        (stats["total_points"] if stats else 0,),
+    )
+
+    rank_result = cursor.fetchone()
+    user_rank = rank_result["rank"] if rank_result else 1
+    cursor.close()
+
+    if stats:
+        stats["rank"] = user_rank
+
+    return render_template("simple_report.html", stats=stats, username=username)
+
+
 @app.route("/profile")
 def profile():
     username = session.get("username", None)
@@ -675,7 +849,7 @@ def user_leaderboard():
                 (user_id,),
             )
             current_user_stats = cursor.fetchone()
-        
+
         cursor.close()
 
         return render_template(
@@ -684,6 +858,7 @@ def user_leaderboard():
             current_user_stats=current_user_stats,
             username=username,
         )
+
 
 @app.route("/update_profile", methods=["POST"])
 def update_user_profile():
