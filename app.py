@@ -134,9 +134,6 @@ def signup():
     return render_template("Signup.html")
 
 
-# @app.route("/success")
-# def valid_login():
-#     return render_template("success.html")
 
 
 @app.route("/success")
@@ -463,7 +460,7 @@ def daily_user_entry():
         )
 
 
-# Add these simplified functions to your app.py file
+
 
 
 def get_user_stats(user_id, days=30):
@@ -616,7 +613,7 @@ def simple_report():
     cursor = db.cursor()
     cursor.execute(
         """
-        SELECT COUNT(*) + 1 as rank
+        SELECT COUNT(*) + 1 as user_rank
         FROM (
             SELECT SUM(emp.points_earned) as total_points
             FROM DailyEntry de 
@@ -630,7 +627,7 @@ def simple_report():
     )
 
     rank_result = cursor.fetchone()
-    user_rank = rank_result["rank"] if rank_result else 1
+    user_rank = rank_result["user_rank"] if rank_result else 1
     cursor.close()
 
     if stats:
