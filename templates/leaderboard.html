@@ -367,10 +367,12 @@
                 </div>
               </div>
             </div>
-            {% endif %} {% if top_users %}
-            <h4 class="crown-header text-center mb-4">👑 Top Performers</h4>
+            {% endif %}
+
+            {% if top_3_winners %}
+            <h4 class="crown-header text-center mb-4">🏆 Top Performers</h4>
             <div class="podium-container">
-              {% for user in top_users[:3] %}
+              {% for user in top_3_winners %}
               <div class="podium-place">
                 <div class="crown-icon">
                   {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% else
@@ -393,7 +395,9 @@
               </div>
               {% endfor %}
             </div>
+            {% endif %}
 
+            {% if top_users %}
             <h5 class="crown-header mt-5 mb-3">📋 Full Rankings</h5>
             <div class="leaderboard-table">
               <table class="table table-dark table-hover mb-0">

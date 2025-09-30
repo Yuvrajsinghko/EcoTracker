@@ -134,8 +134,6 @@ def signup():
     return render_template("Signup.html")
 
 
-
-
 @app.route("/success")
 def registration_done():
     username = session.get("username", None)
@@ -458,9 +456,6 @@ def daily_user_entry():
         return render_template(
             "daily_entry_status.html", name=username, message=message
         )
-
-
-
 
 
 def get_user_stats(user_id, days=30):
@@ -808,19 +803,41 @@ def user_leaderboard():
 
     cursor = db.cursor()
     try:
+        cursor.execute(
+            """
+            SELECT 
+                s.id,
+                s.name,
+                s.username,
+                COALESCE(SUM(emp.points_earned), 0) AS total_points,
+                COALESCE(COUNT(DISTINCT de.daily_id), 0) AS total_entries,
+                COALESCE(AVG(de.carbon_score), 0) AS avg_carbon_score
+            FROM SignupDetails s
+            LEFT JOIN DailyEntry de ON s.id = de.signup_ref_id
+            LEFT JOIN EmployeePoints emp ON de.user_point_id_ref = emp.emp_point_id
+            GROUP BY s.id, s.name, s.username
+            ORDER BY total_points DESC
+            LIMIT 3
+            """,
+        )
+        top_3_winners = cursor.fetchall()
+
         # 1) Pagination params
-        page = request.args.get("page",1,type=int)
-        if page<1:
-            page=1
-        per_page=10
-        cursor.execute("SELECT COUNT(DISTINCT s.id) AS total_users FROM SignupDetails s JOIN DailyEntry de ON s.id = de.signup_ref_id")
+        page = request.args.get("page", 1, type=int)
+        if page < 1:
+            page = 1
+        per_page = 5
+        cursor.execute(
+            """
+            SELECT COUNT(*) AS total_users
+            FROM SignupDetails
+            """
+        )
+        row = cursor.fetchone()
 
-        row= cursor.fetchone()
+        total_users = row["total_users"] if row and row.get("total_users") else 0
 
-        total_users=row["total_users"] if row and row.get("total_user") else 0
-
-
-         # 3) total_pages (ceiling division), ensure at least 1 page
+        # 3) total_pages (ceiling division), ensure at least 1 page
         total_pages = max(1, (total_users + per_page - 1) // per_page)
 
         # 4) clamp page to available range and compute offset
@@ -830,13 +847,16 @@ def user_leaderboard():
 
         cursor.execute(
             """
-            SELECT s.name, s.username,
-                   SUM(emp.points_earned) AS total_points,
-                   COUNT(DISTINCT de.daily_id) AS total_entries,
-                   AVG(de.carbon_score) AS avg_carbon_score
+            SELECT 
+                s.id,
+                s.name,
+                s.username,
+                COALESCE(SUM(emp.points_earned), 0) AS total_points,
+                COALESCE(COUNT(DISTINCT de.daily_id), 0) AS total_entries,
+                COALESCE(AVG(de.carbon_score), 0) AS avg_carbon_score
             FROM SignupDetails s
-            JOIN DailyEntry de ON s.id = de.signup_ref_id
-            JOIN EmployeePoints emp ON de.user_point_id_ref = emp.emp_point_id
+            LEFT JOIN DailyEntry de ON s.id = de.signup_ref_id
+            LEFT JOIN EmployeePoints emp ON de.user_point_id_ref = emp.emp_point_id
             GROUP BY s.id, s.name, s.username
             ORDER BY total_points DESC
             LIMIT %s OFFSET %s
@@ -874,6 +894,7 @@ def user_leaderboard():
 
     return render_template(
         "leaderboard.html",
+        top_3_winners=top_3_winners,
         top_users=top_users,
         current_user_stats=current_user_stats,
         username=username,
@@ -1009,6 +1030,7 @@ def delete_user_profile():
         db.rollback()
         flash("Error deleting profile", "error")
         return redirect(url_for("profile"))
+
 
 @app.route("/logout")
 def logout():
