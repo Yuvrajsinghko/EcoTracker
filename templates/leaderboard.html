@@ -26,7 +26,6 @@
         z-index: -1;
       }
 
-      /* Same card styling as daily_entry */
       .leaderboard-card {
         background: rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(20px);
@@ -36,7 +35,6 @@
         border: 1px solid rgba(255, 255, 255, 0.3);
       }
 
-      /* Same navbar styling */
       .navbar {
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
       }
@@ -69,7 +67,6 @@
         box-shadow: 0 0 2px #ff00ff;
       }
 
-      /* Same hero neon effect */
       .hero-neon {
         color: #00bfff;
         text-shadow: 0 0 6px #00bfff, 0 0 12px #00bfff, 0 0 24px #00bfff;
@@ -87,7 +84,6 @@
         }
       }
 
-      /* Leaderboard specific styles with same neon theme */
       .crown-header {
         color: #f0d806 !important;
         text-shadow: 0 0 4px #f0d806, 0 0 8px #f0d806;
@@ -121,7 +117,6 @@
         }
       }
 
-      /* Fixed Podium styling */
       .podium-container {
         display: flex;
         justify-content: center;
@@ -129,7 +124,6 @@
         gap: 20px;
         margin: 30px 0;
       }
-
       .podium-place {
         text-align: center;
         transition: all 0.3s ease;
@@ -138,7 +132,6 @@
       .podium-place:hover {
         transform: scale(1.05);
       }
-
       .podium-avatar {
         width: 60px;
         height: 60px;
@@ -155,7 +148,6 @@
         box-shadow: 0 5px 15px rgba(0, 191, 255, 0.3);
       }
 
-      /* Fixed podium base with flexible height */
       .podium-base {
         border-radius: 10px;
         color: white;
@@ -167,11 +159,7 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
       }
-
-      /* Adjusted heights for better content fit */
       .gold-base {
         background: linear-gradient(135deg, #f0d806, #f39c12);
         min-height: 110px;
@@ -188,55 +176,38 @@
         box-shadow: 0 4px 12px rgba(230, 126, 34, 0.4);
       }
 
-      /* Better text sizing for podium content */
       .podium-points {
         font-size: 1.3rem;
         font-weight: bold;
         margin-bottom: 2px;
-        line-height: 1.2;
       }
-
       .podium-points-label {
         font-size: 0.85rem;
         opacity: 0.9;
         margin-bottom: 3px;
       }
-
       .podium-entries {
         font-size: 0.8rem;
         opacity: 0.85;
-        line-height: 1.1;
       }
-
-      /* User name styling with better overflow handling */
       .podium-user-name {
         font-size: 0.95rem;
         font-weight: bold;
         margin-bottom: 3px;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        hyphens: auto;
-        line-height: 1.2;
       }
-
       .podium-username {
         font-size: 0.8rem;
         opacity: 0.8;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
       }
 
-      /* Table styling to match theme */
       .leaderboard-table {
         background: rgba(255, 255, 255, 0.05);
         border-radius: 10px;
         overflow: hidden;
       }
-
       .table-dark {
         background: rgba(0, 0, 0, 0.7) !important;
       }
-
       .table-row {
         background: rgba(255, 255, 255, 0.03);
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -246,14 +217,12 @@
         background: rgba(0, 224, 184, 0.1);
         transform: translateX(5px);
       }
-
       .current-user-row {
         background: rgba(0, 224, 184, 0.2) !important;
         border-left: 4px solid #00e0b8;
         box-shadow: 0 0 10px rgba(0, 224, 184, 0.3);
       }
 
-      /* Same button styling as daily_entry */
       .btn-neon {
         background: transparent;
         color: #66f0d4;
@@ -278,7 +247,6 @@
         padding: 6px 12px;
         border-radius: 20px;
         font-weight: bold;
-        display: inline-block;
         min-width: 35px;
         text-align: center;
         box-shadow: 0 2px 8px rgba(0, 191, 255, 0.3);
@@ -289,7 +257,6 @@
         margin-bottom: 10px;
         animation: bounce 2s infinite ease-in-out;
       }
-
       @keyframes bounce {
         0%,
         100% {
@@ -300,7 +267,6 @@
         }
       }
 
-      /* Stats card styling */
       .stats-card {
         background: rgba(255, 255, 255, 0.08);
         border-radius: 12px;
@@ -314,39 +280,10 @@
         font-weight: bold;
         font-size: 1.8rem;
       }
-
-      /* Mobile responsiveness */
-      @media (max-width: 768px) {
-        .podium-container {
-          flex-direction: column;
-          align-items: center;
-        }
-        .podium-place {
-          width: 100%;
-          max-width: 250px;
-          margin-bottom: 15px;
-        }
-
-        .podium-base {
-          min-height: 80px;
-        }
-
-        .gold-base {
-          min-height: 90px;
-        }
-
-        .silver-base {
-          min-height: 85px;
-        }
-
-        .bronze-base {
-          min-height: 75px;
-        }
-      }
     </style>
   </head>
   <body>
-    <!-- Same navbar as daily_entry -->
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
       <div class="container-fluid">
         <a
@@ -384,7 +321,6 @@
                 >Monthly Report</a
               >
             </li>
-
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('profile') }}">Profile</a>
             </li>
@@ -399,13 +335,11 @@
     </nav>
 
     <div class="container">
-      <!-- Main Leaderboard Card -->
       <div class="row justify-content-center">
         <div class="col-lg-10">
           <div class="leaderboard-card p-4">
             <h2 class="text-center mb-4 hero-neon">🏆 Leaderboard 🏆</h2>
 
-            <!-- Current User Stats -->
             {% if current_user_stats %}
             <div class="stats-card p-3 mb-4">
               <h5 class="stats-header mb-3">📊 Your Stats</h5>
@@ -434,7 +368,6 @@
               </div>
             </div>
             {% endif %} {% if top_users %}
-            <!-- Top 3 Podium -->
             <h4 class="crown-header text-center mb-4">👑 Top Performers</h4>
             <div class="podium-container">
               {% for user in top_users[:3] %}
@@ -461,7 +394,6 @@
               {% endfor %}
             </div>
 
-            <!-- Full Rankings -->
             <h5 class="crown-header mt-5 mb-3">📋 Full Rankings</h5>
             <div class="leaderboard-table">
               <table class="table table-dark table-hover mb-0">
@@ -513,7 +445,7 @@
               </table>
             </div>
 
-            <!-- Pagination controls -->
+            <!-- Compact Pagination -->
             {% if total_pages > 1 %}
             <nav aria-label="Leaderboard pagination">
               <ul class="pagination justify-content-center mt-3">
@@ -524,7 +456,26 @@
                     >Previous</a
                   >
                 </li>
-                {% for p in range(1, total_pages+1) %}
+
+                <!-- First page -->
+                <li class="page-item {% if page == 1 %}active{% endif %}">
+                  <a
+                    class="page-link"
+                    href="{{ url_for('user_leaderboard', page=1) }}"
+                    >1</a
+                  >
+                </li>
+
+                <!-- Left ellipsis -->
+                {% if page > 3 %}
+                <li class="page-item disabled">
+                  <span class="page-link">…</span>
+                </li>
+                {% endif %}
+
+                <!-- Pages around current -->
+                {% for p in range(page-1, page+2) %} {% if p > 1 and p <
+                total_pages %}
                 <li class="page-item {% if p == page %}active{% endif %}">
                   <a
                     class="page-link"
@@ -532,7 +483,28 @@
                     >{{ p }}</a
                   >
                 </li>
-                {% endfor %}
+                {% endif %} {% endfor %}
+
+                <!-- Right ellipsis -->
+                {% if page < total_pages - 2 %}
+                <li class="page-item disabled">
+                  <span class="page-link">…</span>
+                </li>
+                {% endif %}
+
+                <!-- Last page -->
+                {% if total_pages > 1 %}
+                <li
+                  class="page-item {% if page == total_pages %}active{% endif %}"
+                >
+                  <a
+                    class="page-link"
+                    href="{{ url_for('user_leaderboard', page=total_pages) }}"
+                    >{{ total_pages }}</a
+                  >
+                </li>
+                {% endif %}
+
                 <li
                   class="page-item {% if page == total_pages %}disabled{% endif %}"
                 >
@@ -551,20 +523,17 @@
               <a
                 href="{{ url_for('daily_user_entry') }}"
                 class="btn btn-neon mt-3"
+                >Make Your First Entry</a
               >
-                Make Your First Entry
-              </a>
             </div>
             {% endif %}
 
-            <!-- Action Buttons -->
             <div class="text-center mt-4">
               <a
                 href="{{ url_for('daily_user_entry') }}"
                 class="btn btn-neon me-3"
+                >📝 Add Daily Entry</a
               >
-                📝 Add Daily Entry
-              </a>
             </div>
           </div>
         </div>
@@ -573,23 +542,17 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      // Auto-logout after inactivity (client-side only)
-      let inactivityLimit = 5 * 60 * 1000; // 5 minutes
+      let inactivityLimit = 5 * 60 * 1000;
       let inactivityTimer;
-
       function resetTimer() {
         clearTimeout(inactivityTimer);
         inactivityTimer = setTimeout(() => {
-          window.location.href = "{{ url_for('logout') }}"; // Force logout
+          window.location.href = "{{ url_for('logout') }}";
         }, inactivityLimit);
       }
-
-      // Reset timer when user interacts
       ["mousemove", "keydown", "click", "scroll"].forEach((event) => {
         window.addEventListener(event, resetTimer);
       });
-
-      // Start timer
       resetTimer();
     </script>
   </body>
