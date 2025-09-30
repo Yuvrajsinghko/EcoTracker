@@ -805,30 +805,50 @@ def user_leaderboard():
     username = session.get("username", None)
     if not username:
         return redirect(url_for("login"))
-    else:
-        cursor = db.cursor()
 
-        # Fixed query - join through DailyEntry to avoid duplication
+    cursor = db.cursor()
+    try:
+        # 1) Pagination params
+        page = request.args.get("page",1,type=int)
+        if page<1:
+            page=1
+        per_page=10
+        cursor.execute("SELECT COUNT(DISTINCT s.id) AS total_users FROM SignupDetails s JOIN DailyEntry de ON s.id = de.signup_ref_id")
+
+        row= cursor.fetchone()
+
+        total_users=row["total_users"] if row and row.get("total_user") else 0
+
+
+         # 3) total_pages (ceiling division), ensure at least 1 page
+        total_pages = max(1, (total_users + per_page - 1) // per_page)
+
+        # 4) clamp page to available range and compute offset
+        if page > total_pages:
+            page = total_pages
+        offset = (page - 1) * per_page
+
         cursor.execute(
             """
-            SELECT s.name, s.username, 
-                   SUM(emp.points_earned) as total_points,
-                   COUNT(DISTINCT de.daily_id) as total_entries,
-                   AVG(de.carbon_score) as avg_carbon_score 
-            FROM SignupDetails s 
-            JOIN DailyEntry de ON s.id = de.signup_ref_id 
+            SELECT s.name, s.username,
+                   SUM(emp.points_earned) AS total_points,
+                   COUNT(DISTINCT de.daily_id) AS total_entries,
+                   AVG(de.carbon_score) AS avg_carbon_score
+            FROM SignupDetails s
+            JOIN DailyEntry de ON s.id = de.signup_ref_id
             JOIN EmployeePoints emp ON de.user_point_id_ref = emp.emp_point_id
             GROUP BY s.id, s.name, s.username
-            ORDER BY total_points DESC 
-            LIMIT 10
-            
-            """
+            ORDER BY total_points DESC
+            LIMIT %s OFFSET %s
+            """,
+            (per_page, offset),
         )
 
         top_users = cursor.fetchall()
 
         cursor.execute("SELECT id FROM SignupDetails WHERE username = %s", (username,))
         user_result = cursor.fetchone()
+        current_user_stats = None
 
         if user_result:
             user_id = user_result["id"]
@@ -846,15 +866,22 @@ def user_leaderboard():
                 (user_id,),
             )
             current_user_stats = cursor.fetchone()
+    finally:
 
         cursor.close()
 
-        return render_template(
-            "leaderboard.html",
-            top_users=top_users,
-            current_user_stats=current_user_stats,
-            username=username,
-        )
+    start_rank = (page - 1) * per_page + 1
+
+    return render_template(
+        "leaderboard.html",
+        top_users=top_users,
+        current_user_stats=current_user_stats,
+        username=username,
+        page=page,
+        total_pages=total_pages,
+        per_page=per_page,
+        start_rank=start_rank,
+    )
 
 
 @app.route("/update_profile", methods=["POST"])

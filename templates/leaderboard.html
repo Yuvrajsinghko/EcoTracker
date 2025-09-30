@@ -479,7 +479,11 @@
                   <tr
                     class="table-row {% if username == user.username %}current-user-row{% endif %}"
                   >
-                    <td><span class="rank-badge">{{ loop.index }}</span></td>
+                    <td>
+                      <span class="rank-badge"
+                        >{{ (start_rank|default(1)|int) + loop.index0 }}</span
+                      >
+                    </td>
                     <td>
                       <div class="d-flex align-items-center">
                         <div
@@ -508,7 +512,39 @@
                 </tbody>
               </table>
             </div>
-            {% else %}
+
+            <!-- Pagination controls -->
+            {% if total_pages > 1 %}
+            <nav aria-label="Leaderboard pagination">
+              <ul class="pagination justify-content-center mt-3">
+                <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                  <a
+                    class="page-link"
+                    href="{{ url_for('user_leaderboard', page=page-1) }}"
+                    >Previous</a
+                  >
+                </li>
+                {% for p in range(1, total_pages+1) %}
+                <li class="page-item {% if p == page %}active{% endif %}">
+                  <a
+                    class="page-link"
+                    href="{{ url_for('user_leaderboard', page=p) }}"
+                    >{{ p }}</a
+                  >
+                </li>
+                {% endfor %}
+                <li
+                  class="page-item {% if page == total_pages %}disabled{% endif %}"
+                >
+                  <a
+                    class="page-link"
+                    href="{{ url_for('user_leaderboard', page=page+1) }}"
+                    >Next</a
+                  >
+                </li>
+              </ul>
+            </nav>
+            {% endif %} {% else %}
             <div class="text-center text-light py-5">
               <h4>No data available yet!</h4>
               <p>Start making daily entries to see the leaderboard</p>
@@ -558,4 +594,3 @@
     </script>
   </body>
 </html>
-11
