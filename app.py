@@ -61,7 +61,7 @@ INACTIVITY_LIMIT = 300
 @app.before_request
 def enforce_session_rules():
 
-    if request.endpoint in ("login", "signup", "submit", "register", "static"):
+    if request.endpoint in ("login", "signup", "submit", "register", "static","main"):
         return None
 
     username = session.get("username")
@@ -70,7 +70,7 @@ def enforce_session_rules():
 
     if not username or not token or not user_id:
         session.clear()
-        return redirect(url_for("login"))
+        return redirect(url_for("main"))
 
     cursor = db.cursor()
     try:
@@ -84,12 +84,12 @@ def enforce_session_rules():
 
         if not user:
             session.clear()
-            return redirect(url_for("login"))
+            return redirect(url_for("main"))
         # Enforce single-session
         if not user["active_session"] or user["active_session"] != token:
             session.clear()
             flash("You were logged out because you logged in from another device.")
-            return redirect(url_for("login"))
+            return redirect(url_for("main"))
 
         # Enforce inactivity
         if user["last_active"]:
@@ -105,7 +105,7 @@ def enforce_session_rules():
                 db.commit()
                 session.clear()
                 flash("You were logged out due to inactivity")
-                return redirect(url_for("login"))
+                return redirect(url_for("main"))
         # Update last active
         cursor.execute(
             "UPDATE SignupDetails SET last_active = %s WHERE id = %s",
