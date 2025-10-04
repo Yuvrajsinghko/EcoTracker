@@ -125,13 +125,18 @@ def enforce_session_rules():
 
 
 @app.route("/")
-def login():
-    return render_template("Login.html")
+def main():
+    return render_template("landing.html")
 
 
 @app.route("/signup")
 def signup():
     return render_template("Signup.html")
+
+@app.route("/login")
+def login():
+    return render_template("Login.html")
+
 
 
 @app.route("/success")
