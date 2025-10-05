@@ -23,7 +23,6 @@
       z-index: -1;
     }
 
-    /* Profile Card - same glassmorphism as daily entry */
     .profile-card {
       background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(20px);
@@ -37,7 +36,6 @@
       color: white;
     }
 
-    /* Navbar - same as daily entry */
     .navbar {
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
     }
@@ -70,39 +68,23 @@
       box-shadow: 0 0 2px #ff00ff;
     }
 
-    /* Hero Neon */
     .hero-neon {
       color: #00bfff;
       text-shadow: 0 0 6px #00bfff, 0 0 12px #00bfff, 0 0 24px #00bfff;
       animation: heroPulse 3s infinite ease-in-out;
     }
     @keyframes heroPulse {
-      0% {
-        text-shadow: 0 0 6px #00bfff, 0 0 12px #00bfff;
-      }
-      50% {
-        text-shadow: 0 0 12px #00bfff, 0 0 24px #00bfff, 0 0 36px #00bfff;
-      }
-      100% {
-        text-shadow: 0 0 6px #00bfff, 0 0 12px #00bfff;
-      }
+      0% { text-shadow: 0 0 6px #00bfff, 0 0 12px #00bfff; }
+      50% { text-shadow: 0 0 12px #00bfff, 0 0 24px #00bfff, 0 0 36px #00bfff; }
+      100% { text-shadow: 0 0 6px #00bfff, 0 0 12px #00bfff; }
     }
 
-    /* Section Headers */
     @keyframes neonPulse {
-      0% {
-        text-shadow: 0 0 4px currentColor, 0 0 8px currentColor;
-        opacity: 0.9;
-      }
-      50% {
-        text-shadow: 0 0 6px currentColor, 0 0 12px currentColor;
-        opacity: 1;
-      }
-      100% {
-        text-shadow: 0 0 4px currentColor, 0 0 8px currentColor;
-        opacity: 0.9;
-      }
+      0% { text-shadow: 0 0 4px currentColor, 0 0 8px currentColor; opacity: 0.9; }
+      50% { text-shadow: 0 0 6px currentColor, 0 0 12px currentColor; opacity: 1; }
+      100% { text-shadow: 0 0 4px currentColor, 0 0 8px currentColor; opacity: 0.9; }
     }
+    
     .section-header {
       font-weight: bold;
       text-transform: uppercase;
@@ -113,7 +95,6 @@
       color: #5bdc06 !important;
     }
 
-    /* Profile info styling */
     .profile-info p {
       font-size: 1.1rem;
       margin: 10px 0;
@@ -124,7 +105,6 @@
       text-shadow: 0 0 2px #00bfff;
     }
 
-    /* Form styling - consistent with daily entry */
     .form-control, .form-select {
       background: rgba(255, 255, 255, 0.9);
       border: 1px solid rgba(255, 255, 255, 0.3);
@@ -146,7 +126,6 @@
       box-shadow: 0 0 3px #5bdc06;
     }
 
-    /* Buttons - consistent neon styling */
     .btn-neon {
       background: transparent;
       color: #66f0d4;
@@ -157,7 +136,8 @@
       text-shadow: 0 0 1px #66f0d4;
       box-shadow: 0 0 2px #66f0d4, 0 0 4px #66f0d4;
       transition: all 0.3s ease-in-out;
-      padding: 8px 16px;
+      padding: 10px 20px;
+      white-space: nowrap;
     }
     .btn-neon:hover {
       background: rgba(102, 240, 212, 0.15);
@@ -166,7 +146,6 @@
       transform: scale(1.02);
     }
 
-    /* Specialized button colors */
     .btn-edit {
       color: #f0d806;
       border-color: #f0d806;
@@ -203,7 +182,6 @@
       box-shadow: 0 0 4px #ff4d88, 0 0 8px #ff4d88;
     }
 
-    /* Flash Messages - consistent with toasts */
     .custom-alert {
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.3);
@@ -229,7 +207,6 @@
       box-shadow: 0 0 6px rgba(255, 77, 136, 0.6);
     }
 
-    /* Password display styling */
     .password-display {
       display: inline-flex;
       align-items: center;
@@ -253,14 +230,12 @@
       box-shadow: 0 0 4px #66f0d4;
     }
 
-    /* Divider for sections */
     .section-divider {
       border-top: 1px solid rgba(255, 255, 255, 0.3);
       margin: 20px 0;
       padding-top: 15px;
     }
 
-    /* Edit and password forms */
     .edit-form, .password-form {
       display: none;
     }
@@ -272,7 +247,6 @@
       margin-bottom: 5px;
     }
 
-    /* Delete Confirmation Popup - enhanced glassmorphism */
     .popup-overlay {
       position: fixed;
       top: 0;
@@ -357,6 +331,7 @@
       gap: 15px;
       justify-content: center;
       margin-top: 25px;
+      flex-wrap: wrap;
     }
 
     .delete-popup .btn-confirm-delete {
@@ -370,6 +345,7 @@
       text-shadow: 0 0 1px #ff4d88;
       box-shadow: 0 0 2px #ff4d88, 0 0 4px #ff4d88;
       transition: all 0.3s ease;
+      white-space: nowrap;
     }
 
     .delete-popup .btn-confirm-delete:hover {
@@ -389,6 +365,7 @@
       text-shadow: 0 0 1px #66f0d4;
       box-shadow: 0 0 2px #66f0d4, 0 0 4px #66f0d4;
       transition: all 0.3s ease;
+      white-space: nowrap;
     }
 
     .delete-popup .btn-cancel:hover {
@@ -413,7 +390,6 @@
       }
     }
 
-    /* Mobile responsiveness */
     @media (max-width: 768px) {
       .profile-card {
         margin: 10px;
@@ -434,7 +410,6 @@
 </head>
 <body>
   
-  <!-- Navbar - same as daily entry -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
     <div class="container-fluid">
       <a class="navbar-brand fw-bold hero-neon" href="{{ url_for('registration_done') }}">Carbon Tracker</a>
@@ -477,7 +452,6 @@
         <div class="profile-card">
           <h2 class="text-center mb-4 hero-neon">User Profile</h2>
           
-          <!-- Flash Messages -->
           {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
               {% for category, message in messages %}
@@ -488,7 +462,6 @@
             {% endif %}
           {% endwith %}
           
-          <!-- DISPLAY MODE -->
           <div id="display-mode">
             <h5 class="section-header">Profile Information</h5>
             <div class="profile-info">
@@ -502,7 +475,7 @@
                 <span class="password-display">
                   <span id="password-text">***********</span>
                   <button type="button" class="password-toggle" onclick="togglePassword()" title="Show/Hide Password">
-                    <!-- <span id="toggle-icon">Show</span> -->
+                    <span id="toggle-icon">Show</span>
                   </button>
                 </span>
               </p>
@@ -511,15 +484,13 @@
             
             <div class="section-divider"></div>
             
-            <!-- Action buttons -->
-            <div class="text-center">
+            <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
               <button class="btn btn-edit btn-neon" onclick="showEditForm()">✏️ Edit Profile</button>
-              <button class="btn btn-password btn-neon ms-2" onclick="showPasswordForm()">🔒 Change Password</button>
-              <button class="btn btn-delete btn-neon ms-2" onclick="showDeletePopup()">🗑️ Delete Account</button>
+              <button class="btn btn-password btn-neon" onclick="showPasswordForm()">🔒 Change Password</button>
+              <button class="btn btn-delete btn-neon" onclick="showDeletePopup()">🗑️ Delete Account</button>
             </div>
           </div>
           
-          <!-- EDIT PROFILE MODE -->
           <div id="edit-mode" class="edit-form">
             <h5 class="section-header">Edit Profile Information</h5>
             <form method="POST" action="/update_profile">
@@ -557,14 +528,13 @@
                 <p><strong>Date Joined:</strong> {{ user.date_joined }}</p>
               </div>
               
-              <div class="text-center mt-4">
+              <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
                 <button type="submit" class="btn btn-neon">💾 Save Changes</button>
-                <button type="button" class="btn btn-neon ms-2" onclick="hideEditForm()">❌ Cancel</button>
+                <button type="button" class="btn btn-neon" onclick="hideEditForm()">❌ Cancel</button>
               </div>
             </form>
           </div>
 
-          <!-- CHANGE PASSWORD MODE -->
           <div id="password-mode" class="password-form">
             <h5 class="section-header">🔒 Change Password</h5>
             <form method="POST" action="/change_password">
@@ -580,9 +550,9 @@
                 </div>
               </div>
               
-              <div class="text-center mt-4">
+              <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
                 <button type="submit" class="btn btn-neon">🔐 Update Password</button>
-                <button type="button" class="btn btn-neon ms-2" onclick="hidePasswordForm()">❌ Cancel</button>
+                <button type="button" class="btn btn-neon" onclick="hidePasswordForm()">❌ Cancel</button>
               </div>
             </form>
           </div>
@@ -591,7 +561,6 @@
     </div>
   </div>
 
-  <!-- Delete Confirmation Popup -->
   <div class="popup-overlay" id="deletePopup">
     <div class="delete-popup">
       <span class="warning-icon">⚠️</span>
@@ -628,7 +597,6 @@
     function showEditForm() {
       const alerts = document.querySelectorAll('.custom-alert');
       alerts.forEach(alert => alert.remove());
-
       document.getElementById('display-mode').style.display = 'none';
       document.getElementById('edit-mode').style.display = 'block';
       document.getElementById('password-mode').style.display = 'none';
@@ -637,7 +605,6 @@
     function hideEditForm() {
       const alerts = document.querySelectorAll('.custom-alert');
       alerts.forEach(alert => alert.remove());
-
       document.getElementById('edit-mode').style.display = 'none';
       document.getElementById('password-mode').style.display = 'none';
       document.getElementById('display-mode').style.display = 'block';
@@ -646,7 +613,6 @@
     function showPasswordForm() {
       const alerts = document.querySelectorAll('.custom-alert');
       alerts.forEach(alert => alert.remove());
-
       document.getElementById('display-mode').style.display = 'none';
       document.getElementById('edit-mode').style.display = 'none';
       document.getElementById('password-mode').style.display = 'block';
@@ -655,7 +621,6 @@
     function hidePasswordForm() {
       const alerts = document.querySelectorAll('.custom-alert');
       alerts.forEach(alert => alert.remove());
-
       document.getElementById('edit-mode').style.display = 'none';
       document.getElementById('password-mode').style.display = 'none';
       document.getElementById('display-mode').style.display = 'block';
@@ -670,27 +635,22 @@
         toggleIcon.textContent = 'Show';
         passwordVisible = false;
       } else {
-        // In a real application, you'd fetch this from the server
-        // For security reasons, never store actual passwords in frontend
         passwordText.textContent = '{{ user.masked_password or "***********" }}';
         toggleIcon.textContent = 'Hide';
         passwordVisible = true;
       }
     }
 
-    // Show delete confirmation popup
     function showDeletePopup() {
       document.getElementById('deletePopup').classList.add('show');
-      document.body.style.overflow = 'hidden'; // Prevent background scrolling
+      document.body.style.overflow = 'hidden';
     }
 
-    // Hide delete confirmation popup
     function hideDeletePopup() {
       document.getElementById('deletePopup').classList.remove('show');
-      document.body.style.overflow = 'auto'; // Restore background scrolling
+      document.body.style.overflow = 'auto';
     }
 
-    // Confirm deletion and submit form
     function confirmDelete() {
       const form = document.createElement('form');
       form.method = 'POST';
@@ -699,21 +659,18 @@
       form.submit();
     }
 
-    // Close popup when clicking outside of it
     document.getElementById('deletePopup').addEventListener('click', function(e) {
       if (e.target === this) {
         hideDeletePopup();
       }
     });
 
-    // Close popup with Escape key
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
         hideDeletePopup();
       }
     });
 
-    // Password confirmation validation
     document.addEventListener('DOMContentLoaded', function() {
       const passwordForm = document.querySelector('#password-mode form');
       if (passwordForm) {
@@ -729,23 +686,21 @@
         });
       }
     });
-     // Auto-logout after inactivity (client-side only)
-    let inactivityLimit = 5 * 60 * 1000; // 5 minutes
+    
+    let inactivityLimit = 5 * 60 * 1000;
     let inactivityTimer;
 
     function resetTimer() {
       clearTimeout(inactivityTimer);
       inactivityTimer = setTimeout(() => {
-        window.location.href = "{{ url_for('logout') }}"; // Force logout
+        window.location.href = "{{ url_for('logout') }}";
       }, inactivityLimit);
     }
 
-    // Reset timer when user interacts
     ["mousemove", "keydown", "click", "scroll"].forEach(event => {
       window.addEventListener(event, resetTimer);
     });
 
-    // Start timer
     resetTimer();
   </script>
 </body>
