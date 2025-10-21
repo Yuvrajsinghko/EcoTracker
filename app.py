@@ -9,13 +9,14 @@ from flask import (
     url_for,
     make_response,
 )
-import pymysql
+from flask_caching import Cache
 from functools import wraps
 from datetime import date, datetime
 import time
 import uuid
 import re
 from werkzeug.security import generate_password_hash, check_password_hash
+from database import get_db
 
 EMAIL_REGEX = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,63}$")
 PHONE_REGEX = re.compile(
@@ -37,20 +38,20 @@ PHONE_REGEX = re.compile(
 
 app = Flask(__name__)
 
+# Configure Flask app
 app.config.update(
     SESSION_COOKIE_SECURE=False,
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE="Lax",
+    CACHE_TYPE="SimpleCache",
+    CACHE_DEFAULT_TIMEOUT=300
 )
 
+# Initialize cache
+cache = Cache(app)
 
-db = pymysql.connections.Connection(
-    host="localhost",
-    user="yuvraj",
-    password="root69",
-    database="greendb",
-    cursorclass=pymysql.cursors.DictCursor,
-)
+# Use connection pool instead of single connection
+db = get_db()
 
 
 app.secret_key = "secretkey"
@@ -568,6 +569,7 @@ def get_simple_tips(stats):
 
 
 @app.route("/insights")
+@cache.memoize(timeout=300)  # Cache user-specific data for 5 minutes
 def user_insights():
     """Simple insights page"""
     username = session.get("username", None)
@@ -801,6 +803,7 @@ def edit_entry(entry_id):
 
 
 @app.route("/leaderboard", methods=["GET", "POST"])
+@cache.cached(timeout=60)  # Cache for 1 minute
 def user_leaderboard():
     username = session.get("username", None)
     if not username:
@@ -1062,7 +1065,9 @@ def logout():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Import and start session cleanup
+    from session_cleanup import cleanup_thread
+    app.run(debug=True, threaded=True)
 
 
 # def login_required(view_func):
